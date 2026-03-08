@@ -157,7 +157,7 @@ export default function Index() {
             score={data.score}
             status={data.status}
             lastUpdated={data.last_updated}
-            isSimulate={isSimulate}
+            isSimulate={isFallback}
             isLoading={isLoading}
           />
         </motion.div>
@@ -199,10 +199,11 @@ export default function Index() {
               <MoodGauge score={data.score} />
             </div>
 
-            {/* Simulate Toggle */}
+            {/* Connection Status Panel */}
             <SimulateToggle
               isSimulate={isSimulate}
-              onToggle={setIsSimulate}
+              isFallback={isFallback}
+              onToggle={(val) => { setIsSimulate(val); setIsFallback(false); setError(null); }}
               scenario={scenario}
               onScenarioChange={setScenario}
             />
@@ -266,8 +267,8 @@ export default function Index() {
             {/* Footer note */}
             <div className="mt-auto pt-3 border-t border-war-border/30">
               <p className="text-xs text-muted-foreground font-mono-tech text-center">
-                {isSimulate
-                  ? "// נתוני סימולציה — לא נתוני חדשות אמיתיים"
+                {isSimulate || isFallback
+                  ? isFallback ? "// נתוני ברירת מחדל — אין חיבור לשרת" : "// נתוני סימולציה — לא נתוני חדשות אמיתיים"
                   : `// מקורות: ynet, walla, mako, n12, haaretz`}
               </p>
             </div>
