@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { ToggleLeft, ToggleRight, Zap, Database } from "lucide-react";
+import { ToggleLeft, ToggleRight, Zap, Database, WifiOff } from "lucide-react";
 
 interface SimulateToggleProps {
   isSimulate: boolean;
+  isFallback: boolean;
   onToggle: (val: boolean) => void;
   scenario: "calm" | "moderate" | "panic";
   onScenarioChange: (s: "calm" | "moderate" | "panic") => void;
