@@ -2,7 +2,7 @@
 The National Pulse (מצב הרוח הלאומי) — FastAPI Backend
 =======================================================
 Requirements:
-    pip install fastapi uvicorn feedparser beautifulsoup4 requests google-generativeai python-dotenv
+    pip install fastapi uvicorn feedparser beautifulsoup4 requests google-genai python-dotenv
 
 Run:
     uvicorn main:app --reload --port 8000
@@ -13,14 +13,16 @@ Environment variables (.env):
 
 import re
 import os
+import json
 import time
 import feedparser
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,11 +40,30 @@ app.add_middleware(
 
 # ─── Configure Gemini ────────────────────────────────────────────────────────
 GEMINI_KEY = os.getenv("GEMINI_API_KEY", "")
-if GEMINI_KEY:
-    genai.configure(api_key=GEMINI_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-else:
-    model = None  # Fallback to keyword-based scoring
+client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
+
+# ─── Cache ───────────────────────────────────────────────────────────────────
+CACHE_FILE = Path(__file__).parent / "mood_cache.json"
+CACHE_TTL = 30 * 60  # 30 minutes
+
+
+def load_cache() -> dict | None:
+    try:
+        if CACHE_FILE.exists():
+            data = json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+            if time.time() - data.get("saved_at", 0) < CACHE_TTL:
+                return data
+    except Exception as e:
+        print(f"[Cache read error] {e}")
+    return None
+
+
+def save_cache(data: dict) -> None:
+    try:
+        data["saved_at"] = time.time()
+        CACHE_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[Cache write error] {e}")
 
 # ─── RSS Feeds ───────────────────────────────────────────────────────────────
 RSS_FEEDS = [
@@ -126,7 +147,7 @@ def keyword_score(text: str) -> int:
 
 def llm_score_headlines(headlines: list[dict]) -> list[dict]:
     """Use Gemini to score each headline. Fallback to keywords if unavailable."""
-    if not model:
+    if not client:
         for h in headlines:
             h["impact"] = keyword_score(h["text"])
         return headlines
@@ -135,6 +156,7 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
     prompt = f"""
 אתה מנתח ידיעות חדשות ישראליות. עבור כל כותרת, הקצה ציון השפעה על לחץ ציבורי בין -30 (מרגיע מאוד) ל-+30 (מעורר פאניקה מאוד).
 ציון 0 = ניטרלי. שלח בחזרה רק מספרים מופרדים בפסיקים, ללא טקסט.
+שים לב כי כותרות יכולות להיות מורכבות, עם ניואנסים. נסה להבין את ההקשר ולהעריך את ההשפעה הכוללת על מצב הרוח הלאומי בישראל (שים לב כי אנחנו בעיצומה של מלחמה מול איראן ולכן כותרת בסגנון "ישראל תקפה בטהרן" תהיה מרגיעה).
 
 כותרות:
 {titles}
@@ -142,9 +164,10 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
 ענה בפורמט: 5,-12,20,3,...  (מספר אחד לכל שורה, בסדר)
 """
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(model="gemini-3.1-flash-lite-preview", contents=prompt)
         raw = response.text.strip()
         scores = [int(x.strip()) for x in re.findall(r"-?\d+", raw)]
+        print(f"[LLM scores] {scores}")
         for i, h in enumerate(headlines):
             h["impact"] = max(-30, min(30, scores[i])) if i < len(scores) else keyword_score(h["text"])
     except Exception as e:
@@ -168,6 +191,10 @@ def calculate_score(headlines: list[dict]) -> int:
 # ─── Route ───────────────────────────────────────────────────────────────────
 @app.get("/api/mood", response_model=MoodResponse)
 async def get_mood():
+    cached = load_cache()
+    if cached:
+        return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
+
     raw_headlines = fetch_headlines()
 
     if not raw_headlines:
@@ -181,9 +208,9 @@ async def get_mood():
 
     scored = llm_score_headlines(raw_headlines)
 
-    # Sort by absolute impact, take top 8
+    # Sort by absolute impact, take top 20
     scored.sort(key=lambda h: abs(h.get("impact", 0)), reverse=True)
-    top = scored[:8]
+    top = scored[:20]
 
     total_score = calculate_score(scored)
 
@@ -198,19 +225,24 @@ async def get_mood():
         for i, h in enumerate(top)
     ]
 
-    return MoodResponse(
+    result = MoodResponse(
         score=total_score,
         status=get_status(total_score),
         top_headlines=headlines_out,
         last_updated=datetime.now().isoformat(),
     )
+    save_cache(result.model_dump())
+    return result
 
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "llm": "gemini" if model else "keywords-only"}
+    return {"status": "ok", "llm": "gemini" if client else "keywords-only"}
 
 
 if __name__ == "__main__":
+    # print(fetch_headlines())  # warm up feeds
+    # exit()
+    
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
