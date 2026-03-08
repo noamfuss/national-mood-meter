@@ -1,0 +1,20 @@
+services:
+    backend:
+        # build: ./backend
+        image: stress-meter-backend:latest
+        env_file:
+            - ./backend/.env
+        volumes:
+            - type: bind
+              source: ./backend/mood_cache.json
+              target: /app/mood_cache.json
+        ports:
+            - "8000:8000"
+        restart: unless-stopped
+    
+    frontend:
+        # build: ./frontend
+        image: stress-meter:latest
+        ports:
+            - "8081:80"
+        restart: unless-stopped
