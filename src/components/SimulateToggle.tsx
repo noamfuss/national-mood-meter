@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { ToggleLeft, ToggleRight, Zap, Database } from "lucide-react";
+import { ToggleLeft, ToggleRight, Zap, Database, WifiOff } from "lucide-react";
 
 interface SimulateToggleProps {
   isSimulate: boolean;
+  isFallback: boolean;
   onToggle: (val: boolean) => void;
   scenario: "calm" | "moderate" | "panic";
   onScenarioChange: (s: "calm" | "moderate" | "panic") => void;
@@ -14,15 +15,24 @@ const SCENARIOS = [
   { key: "panic", label: "פאניקה", color: "text-score-panic border-score-panic/40 bg-score-panic/10 hover:bg-score-panic/20" },
 ] as const;
 
-export default function SimulateToggle({ isSimulate, onToggle, scenario, onScenarioChange }: SimulateToggleProps) {
+export default function SimulateToggle({ isSimulate, isFallback, onToggle, scenario, onScenarioChange }: SimulateToggleProps) {
+  const showSimControls = isSimulate || isFallback;
+
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-lg border border-war-border bg-war-card/50">
-      {/* Toggle row */}
+    <div className={`flex flex-col gap-3 p-4 rounded-lg border bg-war-card/50 transition-colors duration-500
+      ${isFallback ? "border-score-panic/40" : isSimulate ? "border-score-neutral/40" : "border-war-border"}
+    `}>
+      {/* Status row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {isSimulate ? <Zap size={14} className="text-score-neutral" /> : <Database size={14} className="text-muted-foreground" />}
-          <span className="text-xs font-mono-tech text-muted-foreground">
-            {isSimulate ? "מצב סימולציה" : "מצב חי (API)"}
+          {isFallback
+            ? <WifiOff size={14} className="text-score-panic" />
+            : isSimulate
+              ? <Zap size={14} className="text-score-neutral" />
+              : <Database size={14} className="text-score-calm" />
+          }
+          <span className={`text-xs font-mono-tech ${isFallback ? "text-score-panic" : isSimulate ? "text-score-neutral" : "text-score-calm"}`}>
+            {isFallback ? "אין חיבור — נתוני ברירת מחדל" : isSimulate ? "מצב סימולציה" : "מחובר ל-API"}
           </span>
         </div>
         <button
@@ -38,8 +48,8 @@ export default function SimulateToggle({ isSimulate, onToggle, scenario, onScena
         </button>
       </div>
 
-      {/* Scenario selector (only in simulate mode) */}
-      {isSimulate && (
+      {/* Scenario selector (only in simulate/fallback mode) */}
+      {showSimControls && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}

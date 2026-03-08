@@ -12,7 +12,8 @@ const API_URL = "http://localhost:8000/api/mood";
 const REFRESH_INTERVAL = 60_000; // 1 minute
 
 export default function Index() {
-  const [isSimulate, setIsSimulate] = useState(true);
+  const [isSimulate, setIsSimulate] = useState(false);
+  const [isFallback, setIsFallback] = useState(false);
   const [scenario, setScenario] = useState<"calm" | "moderate" | "panic">("moderate");
   const [data, setData] = useState<MoodData>(SIMULATE_SCENARIOS.moderate);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +23,6 @@ export default function Index() {
   const fetchData = useCallback(async () => {
     if (isSimulate) {
       setIsLoading(true);
-      // Simulate a brief loading delay
       await new Promise((r) => setTimeout(r, 600));
       setData({ ...SIMULATE_SCENARIOS[scenario], last_updated: new Date().toISOString() });
       setError(null);
@@ -38,10 +38,15 @@ export default function Index() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json: MoodData = await res.json();
       setData(json);
+      setIsFallback(false);
+      setError(null);
       setLastRefresh(new Date());
     } catch (err) {
-      setError("לא ניתן להתחבר ל-API. מפעיל מצב סימולציה.");
-      setIsSimulate(true);
+      // Auto-fallback to static data — no manual simulate needed
+      setIsFallback(true);
+      setData({ ...SIMULATE_SCENARIOS[scenario], last_updated: new Date().toISOString() });
+      setError("לא ניתן להתחבר ל-API. מציג נתוני ברירת מחדל.");
+      setLastRefresh(new Date());
     } finally {
       setIsLoading(false);
     }
@@ -52,12 +57,11 @@ export default function Index() {
     fetchData();
   }, [fetchData]);
 
-  // Auto-refresh
+  // Auto-refresh (always active; when live it retries the backend, when fallback it keeps data fresh)
   useEffect(() => {
-    if (isSimulate) return;
     const interval = setInterval(fetchData, REFRESH_INTERVAL);
     return () => clearInterval(interval);
-  }, [isSimulate, fetchData]);
+  }, [fetchData]);
 
   const { textClass, borderClass } = getScoreLabel(data.score);
   const isPanic = data.score >= 65;
@@ -153,7 +157,7 @@ export default function Index() {
             score={data.score}
             status={data.status}
             lastUpdated={data.last_updated}
-            isSimulate={isSimulate}
+            isSimulate={isFallback}
             isLoading={isLoading}
           />
         </motion.div>
@@ -195,10 +199,11 @@ export default function Index() {
               <MoodGauge score={data.score} />
             </div>
 
-            {/* Simulate Toggle */}
+            {/* Connection Status Panel */}
             <SimulateToggle
               isSimulate={isSimulate}
-              onToggle={setIsSimulate}
+              isFallback={isFallback}
+              onToggle={(val) => { setIsSimulate(val); setIsFallback(false); setError(null); }}
               scenario={scenario}
               onScenarioChange={setScenario}
             />
@@ -262,8 +267,8 @@ export default function Index() {
             {/* Footer note */}
             <div className="mt-auto pt-3 border-t border-war-border/30">
               <p className="text-xs text-muted-foreground font-mono-tech text-center">
-                {isSimulate
-                  ? "// נתוני סימולציה — לא נתוני חדשות אמיתיים"
+                {isSimulate || isFallback
+                  ? isFallback ? "// נתוני ברירת מחדל — אין חיבור לשרת" : "// נתוני סימולציה — לא נתוני חדשות אמיתיים"
                   : `// מקורות: ynet, walla, mako, n12, haaretz`}
               </p>
             </div>
