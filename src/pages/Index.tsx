@@ -12,7 +12,8 @@ const API_URL = "http://localhost:8000/api/mood";
 const REFRESH_INTERVAL = 60_000; // 1 minute
 
 export default function Index() {
-  const [isSimulate, setIsSimulate] = useState(true);
+  const [isSimulate, setIsSimulate] = useState(false);
+  const [isFallback, setIsFallback] = useState(false);
   const [scenario, setScenario] = useState<"calm" | "moderate" | "panic">("moderate");
   const [data, setData] = useState<MoodData>(SIMULATE_SCENARIOS.moderate);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +23,6 @@ export default function Index() {
   const fetchData = useCallback(async () => {
     if (isSimulate) {
       setIsLoading(true);
-      // Simulate a brief loading delay
       await new Promise((r) => setTimeout(r, 600));
       setData({ ...SIMULATE_SCENARIOS[scenario], last_updated: new Date().toISOString() });
       setError(null);
@@ -38,10 +38,15 @@ export default function Index() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json: MoodData = await res.json();
       setData(json);
+      setIsFallback(false);
+      setError(null);
       setLastRefresh(new Date());
     } catch (err) {
-      setError("לא ניתן להתחבר ל-API. מפעיל מצב סימולציה.");
-      setIsSimulate(true);
+      // Auto-fallback to static data — no manual simulate needed
+      setIsFallback(true);
+      setData({ ...SIMULATE_SCENARIOS[scenario], last_updated: new Date().toISOString() });
+      setError("לא ניתן להתחבר ל-API. מציג נתוני ברירת מחדל.");
+      setLastRefresh(new Date());
     } finally {
       setIsLoading(false);
     }
