@@ -44,7 +44,7 @@ client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 
 # ─── Cache ───────────────────────────────────────────────────────────────────
 CACHE_FILE = Path(__file__).parent / "mood_cache.json"
-CACHE_TTL = 30 * 60  # 30 minutes
+CACHE_TTL = 10 * 60  # 10 minutes
 
 
 def load_cache() -> dict | None:
@@ -66,12 +66,12 @@ def save_cache(data: dict) -> None:
         print(f"[Cache write error] {e}")
 
 # ─── RSS Feeds ───────────────────────────────────────────────────────────────
-RSS_FEEDS = [
-    "https://www.ynet.co.il/Integration/StoryRss2.xml",
-    "https://rss.walla.co.il/feed/22",       # Walla news
-    "https://www.mako.co.il/AjaxPage?jspName=rssFeed.jsp&type=news",
-    "https://www.n12.co.il/rss",
-]
+RSS_FEEDS = {
+    "Ynet": "https://www.ynet.co.il/Integration/StoryRss2.xml",
+    "Walla": "https://rss.walla.co.il/feed/22",
+    "Haaretz": "https://www.haaretz.co.il/srv/rss---feedly",
+    "Mako": "https://storage.googleapis.com/mako-sitemaps/rssHomepage.xml",
+}
 
 # ─── Keyword Stress Weights ──────────────────────────────────────────────────
 STRESS_KEYWORDS: dict[str, int] = {
@@ -122,17 +122,16 @@ class MoodResponse(BaseModel):
 def fetch_headlines() -> list[dict]:
     """Fetch headlines from all RSS feeds."""
     results = []
-    for feed_url in RSS_FEEDS:
+    for feed_source, feed_url in RSS_FEEDS.items():
         try:
             feed = feedparser.parse(feed_url)
-            source = feed.feed.get("title", feed_url.split("/")[2])
-            for entry in feed.entries[:6]:  # top 6 per source
+            for entry in feed.entries[:10]:  # top 10 per source
                 title = entry.get("title", "").strip()
                 if title:
-                    results.append({"text": title, "source": source})
+                    results.append({"text": title, "source": feed_source})
         except Exception as e:
             print(f"[Feed error] {feed_url}: {e}")
-    return results[:20]  # max 20 headlines
+    return results
 
 
 def keyword_score(text: str) -> int:
@@ -154,14 +153,23 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
 
     titles = "\n".join([f"{i+1}. {h['text']}" for i, h in enumerate(headlines)])
     prompt = f"""
-אתה מנתח ידיעות חדשות ישראליות. עבור כל כותרת, הקצה ציון השפעה על לחץ ציבורי בין -30 (מרגיע מאוד) ל-+30 (מעורר פאניקה מאוד).
-ציון 0 = ניטרלי. שלח בחזרה רק מספרים מופרדים בפסיקים, ללא טקסט.
-שים לב כי כותרות יכולות להיות מורכבות, עם ניואנסים. נסה להבין את ההקשר ולהעריך את ההשפעה הכוללת על מצב הרוח הלאומי בישראל (שים לב כי אנחנו בעיצומה של מלחמה מול איראן ולכן כותרת בסגנון "ישראל תקפה בטהרן" תהיה מרגיעה).
+"אתה אנליסט מומחה לניתוח סנטימנט בטחוני בישראל. תפקידך לדרג כותרות חדשות לפי השפעתן על **'מדד הפאניקה הלאומי'**.
 
-כותרות:
+**סולם הדירוג (-10 עד +30):**
+- **חיובי (0 עד מינוס 10):** הצלחות מבצעיות משמעותיות, חיסול בכירים, הצהרות הרגעה רשמיות של דו"צ, חזרה לשגרה מלאה, יירוטים מוצלחים של אירוע חריג. (זכור: במלחמה הנוכחית, תקיפה בטהרן נחשבת מרגיעה מאוד).
+- **ניטרלי (0):** חדשות תרבות, ספורט, מזג אוויר, פטירות של אישים שאינן קשורות למלחמה (למשל: דמויות עבר, אמנים), ונושאים כלכליים שוטפים. **כל מה שלא משנה את רמת האיום הבטחוני הוא 0.**
+- **שלילי (פלוס 1 עד פלוס 10):** שיבושי GPS, שמועות בטלגרם, דריכות גבוהה, שינויים קלים בהנחיות, הרוגים בודדים(1-2) מהצד הישראלי.
+- **פאניקה (פלוס 11 עד פלוס 30):** מתקפה משולבת, ירי ללא הפסקה, אירוע רב נפגעים, נאומים של מנהיגי אויב עם איום מפורש, תקיפת תשתיות קריטיות (חשמל/מים).
+
+**הנחיות קריטיות:**
+1. אם הכותרת היא ידיעת צבע, פנאי או ידיעה על פטירה של אדם מבוגר בנסיבות טבעיות - הציון הוא **0**.
+2. אם הידיעה "עצובה" אך לא "מפחידה", הציון הוא **0**.
+3. נתח כל כותרת בקונטקסט של מלחמה שלנו (ישראל וארצות הברית) מול איראן.
+
+כותרות לניתוח:
 {titles}
 
-ענה בפורמט: 5,-12,20,3,...  (מספר אחד לכל שורה, בסדר)
+ענה בפורמט של רשימת מספרים מופרדים בפסיקים בלבד, לפי הסדר: 12,0,-5,22"
 """
     try:
         response = client.models.generate_content(model="gemini-3.1-flash-lite-preview", contents=prompt)
@@ -169,7 +177,7 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
         scores = [int(x.strip()) for x in re.findall(r"-?\d+", raw)]
         print(f"[LLM scores] {scores}")
         for i, h in enumerate(headlines):
-            h["impact"] = max(-30, min(30, scores[i])) if i < len(scores) else keyword_score(h["text"])
+            h["impact"] = max(-10, min(30, scores[i])) if i < len(scores) else keyword_score(h["text"])
     except Exception as e:
         print(f"[LLM error] {e} — falling back to keywords")
         for h in headlines:
