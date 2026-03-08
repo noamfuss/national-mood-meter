@@ -57,12 +57,11 @@ export default function Index() {
     fetchData();
   }, [fetchData]);
 
-  // Auto-refresh
+  // Auto-refresh (always active; when live it retries the backend, when fallback it keeps data fresh)
   useEffect(() => {
-    if (isSimulate) return;
     const interval = setInterval(fetchData, REFRESH_INTERVAL);
     return () => clearInterval(interval);
-  }, [isSimulate, fetchData]);
+  }, [fetchData]);
 
   const { textClass, borderClass } = getScoreLabel(data.score);
   const isPanic = data.score >= 65;
