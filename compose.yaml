@@ -13,7 +13,7 @@ services:
         restart: unless-stopped
     
     frontend:
-        # build: ./frontend
+        # build: ./
         image: stress-meter:latest
         ports:
             - "8081:80"
