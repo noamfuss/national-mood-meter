@@ -1,10 +1,31 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Clock } from "lucide-react";
 import type { Headline } from "@/lib/moodData";
 
 interface HeadlinesFeedProps {
   headlines: Headline[];
 }
+
+const formatRelativeTime = (timestamp: string) => {
+  if (!timestamp) return "";
+  try {
+    const pubDate = new Date(timestamp);
+    if (isNaN(pubDate.getTime())) return timestamp; // Fallback if not a valid date
+
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - pubDate.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return "עכשיו";
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `לפני ${diffInMinutes} דק'`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `לפני ${diffInHours} שע'`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `לפני ${diffInDays} ימים`;
+  } catch (e) {
+    return timestamp;
+  }
+};
 
 export default function HeadlinesFeed({ headlines }: HeadlinesFeedProps) {
   return (
@@ -13,6 +34,7 @@ export default function HeadlinesFeed({ headlines }: HeadlinesFeedProps) {
         {headlines.map((headline, index) => {
           const isPositive = headline.impact > 0;
           const isNeutral = headline.impact === 0;
+          const relativeTime = formatRelativeTime(headline.timestamp);
 
           return (
             <motion.div
@@ -61,7 +83,10 @@ export default function HeadlinesFeed({ headlines }: HeadlinesFeedProps) {
                 </p>
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-muted-foreground font-mono-tech">{headline.source}</span>
-                  <span className="text-xs text-muted-foreground">{headline.timestamp}</span>
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-mono-tech">
+                    <Clock size={10} />
+                    <span>{relativeTime}</span>
+                  </div>
                 </div>
               </div>
 

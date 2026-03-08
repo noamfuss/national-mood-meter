@@ -128,7 +128,7 @@ def fetch_headlines() -> list[dict]:
             for entry in feed.entries[:10]:  # top 10 per source
                 title = entry.get("title", "").strip()
                 if title:
-                    results.append({"text": title, "source": feed_source})
+                    results.append({"text": title, "source": feed_source, "datetime": entry.get("published", "")})
         except Exception as e:
             print(f"[Feed error] {feed_url}: {e}")
     return results
@@ -228,7 +228,7 @@ async def get_mood():
             text=h["text"],
             source=h["source"],
             impact=h.get("impact", 0),
-            timestamp=f"לפני {(i + 1) * 5} דקות",  # placeholder timing
+            timestamp=h.get("datetime", ""),
         )
         for i, h in enumerate(top)
     ]
