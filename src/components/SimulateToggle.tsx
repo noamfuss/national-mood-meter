@@ -1,0 +1,66 @@
+import { motion } from "framer-motion";
+import { ToggleLeft, ToggleRight, Zap, Database } from "lucide-react";
+
+interface SimulateToggleProps {
+  isSimulate: boolean;
+  onToggle: (val: boolean) => void;
+  scenario: "calm" | "moderate" | "panic";
+  onScenarioChange: (s: "calm" | "moderate" | "panic") => void;
+}
+
+const SCENARIOS = [
+  { key: "calm", label: "שלווה", color: "text-score-calm border-score-calm/40 bg-score-calm/10 hover:bg-score-calm/20" },
+  { key: "moderate", label: "מתח", color: "text-score-neutral border-score-neutral/40 bg-score-neutral/10 hover:bg-score-neutral/20" },
+  { key: "panic", label: "פאניקה", color: "text-score-panic border-score-panic/40 bg-score-panic/10 hover:bg-score-panic/20" },
+] as const;
+
+export default function SimulateToggle({ isSimulate, onToggle, scenario, onScenarioChange }: SimulateToggleProps) {
+  return (
+    <div className="flex flex-col gap-3 p-4 rounded-lg border border-war-border bg-war-card/50">
+      {/* Toggle row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {isSimulate ? <Zap size={14} className="text-score-neutral" /> : <Database size={14} className="text-muted-foreground" />}
+          <span className="text-xs font-mono-tech text-muted-foreground">
+            {isSimulate ? "מצב סימולציה" : "מצב חי (API)"}
+          </span>
+        </div>
+        <button
+          onClick={() => onToggle(!isSimulate)}
+          className="flex items-center gap-2 transition-opacity hover:opacity-80"
+        >
+          <span className="text-xs text-muted-foreground">{isSimulate ? "סימולציה" : "חי"}</span>
+          {isSimulate ? (
+            <ToggleRight size={24} className="text-score-neutral" />
+          ) : (
+            <ToggleLeft size={24} className="text-muted-foreground" />
+          )}
+        </button>
+      </div>
+
+      {/* Scenario selector (only in simulate mode) */}
+      {isSimulate && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="flex gap-2"
+        >
+          {SCENARIOS.map((s) => (
+            <button
+              key={s.key}
+              onClick={() => onScenarioChange(s.key)}
+              className={`
+                flex-1 py-1.5 text-xs font-bold rounded border transition-all duration-200
+                ${s.color}
+                ${scenario === s.key ? "opacity-100 shadow-sm scale-105" : "opacity-50"}
+              `}
+            >
+              {s.label}
+            </button>
+          ))}
+        </motion.div>
+      )}
+    </div>
+  );
+}
