@@ -8,7 +8,7 @@ import StatusBar from "@/components/StatusBar";
 import SimulateToggle from "@/components/SimulateToggle";
 import { SIMULATE_SCENARIOS, getScoreLabel, type MoodData } from "@/lib/moodData";
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000"}/api/mood`;
+const API_URL = import.meta.env.DEV ? "http://localhost:8000/api/mood" : "/api/mood";
 const REFRESH_INTERVAL = 60_000; // 1 minute
 
 export default function Index() {
