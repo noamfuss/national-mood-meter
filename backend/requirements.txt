@@ -1,0 +1,8 @@
+# The National Pulse – Backend
+fastapi
+uvicorn[standard]
+feedparser
+beautifulsoup4
+requests
+google-generativeai
+python-dotenv
