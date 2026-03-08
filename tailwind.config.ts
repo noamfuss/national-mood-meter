@@ -57,33 +57,57 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "score-calm": "hsl(var(--score-calm))",
+        "score-neutral": "hsl(var(--score-neutral))",
+        "score-panic": "hsl(var(--score-panic))",
+        "war-bg": "hsl(220 30% 4%)",
+        "war-card": "hsl(220 25% 7%)",
+        "war-border": "hsl(180 40% 15%)",
+        "war-cyan": "hsl(180 100% 70%)",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        mono: ["Share Tech Mono", "monospace"],
+        sans: ["Heebo", "sans-serif"],
+      },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "radar-spin": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "blink": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.2" },
+        },
+        "slide-in-rtl": {
+          from: { transform: "translateX(-30px)", opacity: "0" },
+          to: { transform: "translateX(0)", opacity: "1" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "radar-spin": "radar-spin 4s linear infinite",
+        "blink": "blink 1s step-start infinite",
+        "slide-in-rtl": "slide-in-rtl 0.4s ease-out",
+      },
+      boxShadow: {
+        "glow-calm": "0 0 20px hsl(150 100% 45% / 0.5), 0 0 60px hsl(150 100% 45% / 0.2)",
+        "glow-neutral": "0 0 20px hsl(50 100% 55% / 0.5), 0 0 60px hsl(50 100% 55% / 0.2)",
+        "glow-panic": "0 0 20px hsl(0 100% 55% / 0.5), 0 0 60px hsl(0 100% 55% / 0.2)",
+        "inner-glow": "inset 0 0 30px hsl(150 100% 45% / 0.1)",
       },
     },
   },
