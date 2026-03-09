@@ -19,6 +19,7 @@ export default function Index() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [scoreOffset, setScoreOffset] = useState(0);
 
   const fetchData = useCallback(async () => {
     if (isSimulate) {
@@ -63,8 +64,14 @@ export default function Index() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const { textClass, borderClass } = getScoreLabel(data.score);
-  const isPanic = data.score >= 65;
+  const handleBoomPress = () => {
+    setScoreOffset(-15);
+    setTimeout(() => setScoreOffset(0), 60000);
+  };
+
+  const currentScore = Math.max(0, data.score + scoreOffset);
+  const { textClass, borderClass } = getScoreLabel(currentScore);
+  const isPanic = currentScore >= 65;
 
   return (
     <div
@@ -154,7 +161,7 @@ export default function Index() {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <StatusBar
-            score={data.score}
+            score={currentScore}
             status={data.status}
             lastUpdated={data.last_updated}
             isSimulate={isFallback}
@@ -190,13 +197,13 @@ export default function Index() {
             <div className={`
               rounded-xl border-2 ${borderClass} bg-war-card/60 backdrop-blur-sm p-5
               shadow-inner transition-all duration-1000
-              ${data.score >= 65 ? "shadow-glow-panic" : data.score < 35 ? "shadow-glow-calm" : "shadow-glow-neutral"}
+              ${currentScore >= 65 ? "shadow-glow-panic" : currentScore < 35 ? "shadow-glow-calm" : "shadow-glow-neutral"}
             `}>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs text-muted-foreground font-mono-tech tracking-widest">// מד הפאניקה הלאומי</span>
                 <span className={`text-xs font-mono-tech font-bold ${textClass}`}>PANIC-O-METER</span>
               </div>
-              <MoodGauge score={data.score} />
+              <MoodGauge score={currentScore} />
             </div>
 
             {/* Connection Status Panel */}
@@ -209,7 +216,7 @@ export default function Index() {
             />
 
             {/* Boom Button */}
-            <BoomButton />
+            <BoomButton onPress={handleBoomPress} />
 
             {/* Stats mini grid */}
             <div className="grid grid-cols-2 gap-3">

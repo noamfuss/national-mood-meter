@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Volume2 } from "lucide-react";
 import { BOOM_MESSAGES } from "@/lib/moodData";
 
-export default function BoomButton() {
+interface BoomButtonProps {
+  onPress: () => void;
+}
+
+export default function BoomButton({ onPress }: BoomButtonProps) {
   const [isActive, setIsActive] = useState(false);
   const [quote, setQuote] = useState("");
   const [cooldown, setCooldown] = useState(false);
@@ -11,13 +15,14 @@ export default function BoomButton() {
   const handlePress = () => {
     if (cooldown) return;
 
+    onPress();
     const randomQuote = BOOM_MESSAGES[Math.floor(Math.random() * BOOM_MESSAGES.length)];
     setQuote(randomQuote);
     setIsActive(true);
     setCooldown(true);
 
     setTimeout(() => setIsActive(false), 5000);
-    setTimeout(() => setCooldown(false), 6000);
+    setTimeout(() => setCooldown(false), 60000);
   };
 
   return (
