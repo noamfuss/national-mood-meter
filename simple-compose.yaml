@@ -11,6 +11,18 @@ services:
             - "8000:8000"
         restart: unless-stopped
     
+    worker:
+        build: 
+            context: ./backend
+            dockerfile: worker.dockerfile
+        env_file:
+            - ./backend/.env
+        volumes:
+            - type: bind
+              source: ./backend/mood_cache.json
+              target: /app/mood_cache.json
+        restart: unless-stopped
+
     frontend:
         build: ./
         ports:
