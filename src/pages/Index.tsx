@@ -303,7 +303,7 @@ export default function Index() {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="text-center text-xs text-muted-foreground font-mono-tech py-4 border-t border-war-border/30"
         >
-          NATIONAL PULSE // מצב הרוח הלאומי // {new Date().getFullYear()} // NOT OFFICIAL NEWS
+          NATIONAL PULSE // מצב הרוח הלאומי // {new Date().getFullYear()} // NOT OFFICIAL NEWS // <a href="https://github.com/noamfuss/national-mood-meter" className="underline hover:text-foreground transition-colors">github</a>
         </motion.footer>
       </div>
     </div>

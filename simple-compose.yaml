@@ -1,0 +1,18 @@
+services:
+    backend:
+        build: ./backend
+        env_file:
+            - ./backend/.env
+        volumes:
+            - type: bind
+              source: ./backend/mood_cache.json
+              target: /app/mood_cache.json
+        ports:
+            - "8000:8000"
+        restart: unless-stopped
+    
+    frontend:
+        build: ./
+        ports:
+            - "8080:80"
+        restart: unless-stopped

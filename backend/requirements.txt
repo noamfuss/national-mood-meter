@@ -2,7 +2,6 @@
 fastapi
 uvicorn[standard]
 feedparser
-beautifulsoup4
 requests
 google-genai
 python-dotenv

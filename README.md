@@ -1,73 +1,84 @@
-# Welcome to your Lovable project
+# 🇮🇱 National Mood Meter (מד מצב הרוח הלאומי)
 
-## Project info
+Because in Israel, "How are you?" is a geopolitical question.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## What is this?
+The **National Mood Meter** is a statistically questionable, emotionally volatile tool that reads real-time news headlines from major Israeli outlets (Ynet, Walla, Mako, Haaretz) and tells you exactly how stressed you should be on a scale of "Everything is fine" to "Get into the shelter"
 
-## How can I edit this code?
+By using AI-powered sentiment analysis via Google Gemini, we provide a definitive, scientific* metric for the collective Israeli psyche
 
-There are several ways of editing your application.
+*\*Not scientific at all. Please don't use this for actual decisions*
 
-**Use Lovable**
+## Features
+- **Real-time Stress Gauge**: A beautifully animated needle that vibrates with the intensity of news notifications.
+- **Headline Impact Feed**: See which specific news items are single-handedly ruining your day.
+- **The Boom Button**: For those moments when you just need to feel something.
+- **AI Sentiment Analysis**: Integration with Google Gemini to understand the nuance between "slightly concerning" and "catastrophic."
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Method 1: Docker Compose (The Easy Way)
+If you have Docker and Docker Compose installed:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **Clone the repo**:
+   ```bash
+   git clone https://github.com/noamfuss/national-mood-meter.git
+   cd national-mood-meter
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Configure (Optional)**:
+   Add your API key to `backend/.env` if you want AI-powered stress:
+   ```env
+   GEMINI_API_KEY=your_key_here
+   ```
 
-Follow these steps:
+3. **Spin it up**:
+   ```bash
+   docker compose -f simple-compose.yaml up
+   ```
+   Access the app at `http://localhost:8080` (or your configured proxy URL).
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Method 2: Manual Setup (The Hard Way)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+#### Backend (Python)
+1. Navigate to the backend folder:
+   ```bash
+   cd backend
+   ```
+2. Create a virtual environment and install dependencies:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+   pip install -r requirements.txt
+   ```
+3. Run the FastAPI server:
+   ```bash
+   uvicorn main:app --reload --port 8000
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+#### Frontend (Node.js)
+1. Navigate to the project root:
+   ```bash
+   cd ..
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   The frontend will be available at `http://localhost:8080`.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+## Tech Stack
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, Framer Motion, shadcn/ui.
+- **Backend**: Python, FastAPI, Feedparser, Google Generative AI.
+- **Deployment**: Docker, Docker Compose, Nginx.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## License
+MIT - Use it, fork it, just don't blame us for your rising blood pressure.

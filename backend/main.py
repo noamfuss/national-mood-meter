@@ -2,7 +2,7 @@
 The National Pulse (מצב הרוח הלאומי) — FastAPI Backend
 =======================================================
 Requirements:
-    pip install fastapi uvicorn feedparser beautifulsoup4 requests google-genai python-dotenv
+    pip install -r requirements.txt
 
 Run:
     uvicorn main:app --reload --port 8000
@@ -18,7 +18,6 @@ import time
 import feedparser
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel

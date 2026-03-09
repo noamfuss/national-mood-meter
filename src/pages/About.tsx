@@ -76,7 +76,7 @@ export default function About() {
 
           <div className="pt-8 border-t border-war-border/30">
             <p className="text-sm text-muted-foreground font-mono-tech text-center">
-              שימו לב: המדד הינו אומדן ויזואלי בלבד ואינו מהווה המלצה או מקור חדשות רשמי.
+              שימו לב: המדד הינו אומדן ויזואלי (והומוריסטי) בלבד ואינו מהווה המלצה או מקור חדשות רשמי.
             </p>
           </div>
         </motion.div>
