@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Bomb, Coffee, Ghost, RefreshCw, Activity, Newspaper } from "lucide-react";
+import { Shield, Bomb, Coffee, Ghost, RefreshCw, Activity, Newspaper, Info } from "lucide-react";
+import { Link } from "react-router-dom";
 import MoodGauge from "@/components/MoodGauge";
 import HeadlinesFeed from "@/components/HeadlinesFeed";
 import BoomButton from "@/components/BoomButton";
@@ -139,18 +140,31 @@ export default function Index() {
             </div>
 
             {/* Refresh button */}
-            <button
-              onClick={fetchData}
-              disabled={isLoading}
-              className={`
-                w-9 h-9 rounded-lg border ${borderClass} flex items-center justify-center
-                text-muted-foreground hover:text-foreground
-                transition-all duration-200 hover:border-current
-                disabled:opacity-40
-              `}
-            >
-              <RefreshCw size={15} className={isLoading ? "animate-spin" : ""} />
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                to="/about"
+                className={`
+                  w-9 h-9 rounded-lg border ${borderClass} flex items-center justify-center
+                  text-muted-foreground hover:text-foreground
+                  transition-all duration-200 hover:border-current
+                `}
+                title="אודות"
+              >
+                <Info size={15} />
+              </Link>
+              <button
+                onClick={fetchData}
+                disabled={isLoading}
+                className={`
+                  w-9 h-9 rounded-lg border ${borderClass} flex items-center justify-center
+                  text-muted-foreground hover:text-foreground
+                  transition-all duration-200 hover:border-current
+                  disabled:opacity-40
+                `}
+              >
+                <RefreshCw size={15} className={isLoading ? "animate-spin" : ""} />
+              </button>
+            </div>
           </div>
         </motion.header>
 
