@@ -122,13 +122,13 @@ class MoodResponse(BaseModel):
 def fetch_headlines() -> list[dict]:
     """Fetch headlines from all RSS feeds."""
     results = []
-    for feed_source, feed_url in RSS_FEEDS.items():
+    for i, (feed_source, feed_url) in enumerate(RSS_FEEDS.items()):
         try:
             feed = feedparser.parse(feed_url)
             for entry in feed.entries[:10]:  # top 10 per source
                 title = entry.get("title", "").strip()
                 if title:
-                    results.append({"text": title, "source": feed_source, "datetime": entry.get("published", "")})
+                    results.append({"id": i, "text": title, "source": feed_source, "datetime": entry.get("published", "")})
         except Exception as e:
             print(f"[Feed error] {feed_url}: {e}")
     return results
@@ -196,6 +196,22 @@ def calculate_score(headlines: list[dict]) -> int:
     return max(0, min(100, int(normalized)))
 
 
+def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
+    """Remove near-duplicate headlines based on text similarity."""
+    prompt = "אתה אלגוריתם מומחה לזיהוי כותרות חדשות דומות. קבל רשימת כותרות והחזר רק את הייחודיות ביותר, תוך הסרה של כותרות שנראות כמעט זהות או מתייחסות לאותו אירוע. הנה הכותרות:\n"
+    for h in headlines:
+        prompt += f"{h['id']}. {h['text']}\n"
+    prompt += "\nהחזר את מספרי הכותרות הייחודיות בלבד, מופרדים על ידי פסיקים."
+    try:
+        response = client.models.generate_content(model="gemini-3.1-flash-lite-preview", contents=prompt)
+        raw = response.text.strip()
+        unique_ids = set(int(x.strip()) for x in re.findall(r"\d+", raw))
+        print(f"[Deduplication] Keeping IDs: {unique_ids}")
+        return [h for h in headlines if int(h["id"]) in unique_ids]
+    except Exception as e:
+        print(f"[Deduplication error] {e} — returning original list")
+        return headlines
+
 # ─── Route ───────────────────────────────────────────────────────────────────
 @app.get("/api/mood", response_model=MoodResponse)
 async def get_mood():
@@ -204,6 +220,7 @@ async def get_mood():
         return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
 
     raw_headlines = fetch_headlines()
+    raw_headlines = deduplicate_headlines(raw_headlines)
 
     if not raw_headlines:
         # Emergency fallback
