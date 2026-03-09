@@ -46,13 +46,19 @@ client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 CACHE_FILE = Path(__file__).parent / "mood_cache.json"
 CACHE_TTL = 10 * 60  # 10 minutes
 
+def get_cache() -> dict | None:
+    data = load_cache()
+    if data and "saved_at" in data:
+        age = time.time() - data["saved_at"]
+        if age < CACHE_TTL:
+            return data
+    return None
 
 def load_cache() -> dict | None:
     try:
         if CACHE_FILE.exists():
             data = json.loads(CACHE_FILE.read_text(encoding="utf-8"))
-            if time.time() - data.get("saved_at", 0) < CACHE_TTL:
-                return data
+            return data
     except Exception as e:
         print(f"[Cache read error] {e}")
     return None
@@ -152,6 +158,8 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
         return headlines
 
     titles = "\n".join([f"{i+1}. {h['text']}" for i, h in enumerate(headlines)])
+    cached_headlines = load_cache().get("top_headlines") or []
+    history = "\n".join([f"{i+1}. {h['text']} (score: {h.get('impact', 'N/A')})" for i, h in enumerate(cached_headlines or [])])  #
     prompt = f"""
 "אתה אנליסט מומחה לניתוח סנטימנט בטחוני בישראל. תפקידך לדרג כותרות חדשות לפי השפעתן על **'מדד הפאניקה הלאומי'**.
 
@@ -161,15 +169,21 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
 - **שלילי (פלוס 1 עד פלוס 10):** שיבושי GPS, שמועות בטלגרם, דריכות גבוהה, שינויים קלים בהנחיות, הרוגים בודדים(1-2) מהצד הישראלי.
 - **פאניקה (פלוס 11 עד פלוס 30):** מתקפה משולבת, ירי ללא הפסקה, אירוע רב נפגעים, נאומים של מנהיגי אויב עם איום מפורש, תקיפת תשתיות קריטיות (חשמל/מים).
 
-**הנחיות קריטיות:**
-1. אם הכותרת היא ידיעת צבע, פנאי או ידיעה על פטירה של אדם מבוגר בנסיבות טבעיות - הציון הוא **0**.
-2. אם הידיעה "עצובה" אך לא "מפחידה", הציון הוא **0**.
-3. נתח כל כותרת בקונטקסט של מלחמה שלנו (ישראל וארצות הברית) מול איראן.
+**דירוגים קודמים (לצורך שמירה על קונסיסטנטיות):**
+להלן כותרות שדורגו בעבר והציונים שניתנו להן. עליך לוודא שהדירוגים החדשים מתכתבים איתם בצורה לוגית:
+{history}
 
-כותרות לניתוח:
+**הנחיות קריטיות לקונסיסטנטיות:**
+1. עיין ברשימת 'דירוגים קודמים'. אם כותרת חדשה דומה במהותה לכותרת מהעבר, עליה לקבל ציון זהה או קרוב מאוד.
+2. שמור על "רמת רגישות" קבועה: אל תהיה מחמיר מדי פעם אחת ומקל מדי בפעם אחרת.
+3. אם הכותרת היא ידיעת צבע, פנאי או ידיעה על פטירה של אדם בנסיבות טבעיות - הציון הוא **0**.
+4. אם הידיעה "עצובה" אך לא "מפחידה", הציון הוא **0**.
+5. נתח כל כותרת בקונטקסט של המלחמה הנוכחית מול איראן ושלוחותיה.
+
+**כותרות חדשות לניתוח:**
 {titles}
 
-ענה בפורמט של רשימת מספרים מופרדים בפסיקים בלבד, לפי הסדר: 12,0,-5,22"
+ענה בפורמט של רשימת מספרים מופרדים בפסיקים בלבד (לפי סדר הכותרות החדשות בלבד): 12,0,-5,22"
 """
     try:
         response = client.models.generate_content(model="gemini-3.1-flash-lite-preview", contents=prompt)
@@ -215,7 +229,7 @@ def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
 # ─── Route ───────────────────────────────────────────────────────────────────
 @app.get("/api/mood", response_model=MoodResponse)
 async def get_mood():
-    cached = load_cache()
+    cached = get_cache()
     if cached:
         return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
 
