@@ -140,8 +140,8 @@ export default function MoodGauge({ score }: MoodGaugeProps) {
             strokeLinecap="round"
             filter="url(#glow-filter)"
           />
-          <circle cx={cx} cy={cy} r={6} fill={color} filter="url(#glow-filter)" />
-          <circle cx={cx} cy={cy} r={3} fill="hsl(220, 30%, 4%)" />
+          <circle cx={cx} cy={cy - 20} r={6} fill={color} filter="url(#glow-filter)" />
+          <circle cx={cx} cy={cy - 20} r={3} fill="hsl(220, 30%, 4%)" />
         </motion.g>
 
         {/* Score text */}

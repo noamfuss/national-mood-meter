@@ -46,6 +46,9 @@ client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 CACHE_FILE = Path(__file__).parent / "mood_cache.json"
 CACHE_TTL = 10 * 60  # 10 minutes
 
+def log_request() -> None:
+    print(f"[{datetime.now().isoformat()}] Received request for /api/mood", flush=True)
+
 def get_cache() -> dict | None:
     data = load_cache()
     if data and "saved_at" in data:
@@ -186,7 +189,7 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
 ענה בפורמט של רשימת מספרים מופרדים בפסיקים בלבד (לפי סדר הכותרות החדשות בלבד): 12,0,-5,22"
 """
     try:
-        response = client.models.generate_content(model="gemini-3.1-flash-lite-preview", contents=prompt)
+        response = client.models.generate_content(model="gemini-3-flash-preview", contents=prompt)
         raw = response.text.strip()
         scores = [int(x.strip()) for x in re.findall(r"-?\d+", raw)]
         print(f"[LLM scores] {scores}")
@@ -229,6 +232,7 @@ def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
 # ─── Route ───────────────────────────────────────────────────────────────────
 @app.get("/api/mood", response_model=MoodResponse)
 async def get_mood():
+    log_request()
     cached = get_cache()
     if cached:
         return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
