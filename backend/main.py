@@ -52,7 +52,7 @@ def get_cache() -> dict | None:
         age = time.time() - data["saved_at"]
         if age < CACHE_TTL:
             return data
-    return None
+    return {}
 
 def load_cache() -> dict | None:
     try:
@@ -61,7 +61,7 @@ def load_cache() -> dict | None:
             return data
     except Exception as e:
         print(f"[Cache read error] {e}")
-    return None
+    return {}
 
 
 def save_cache(data: dict) -> None:
