@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield } from "lucide-react";
-import { HAGARI_QUOTES } from "@/lib/moodData";
+import { Volume2 } from "lucide-react";
+import { BOOM_MESSAGES } from "@/lib/moodData";
 
-export default function HagariButton() {
+export default function BoomButton() {
   const [isActive, setIsActive] = useState(false);
   const [quote, setQuote] = useState("");
   const [cooldown, setCooldown] = useState(false);
@@ -11,7 +11,7 @@ export default function HagariButton() {
   const handlePress = () => {
     if (cooldown) return;
 
-    const randomQuote = HAGARI_QUOTES[Math.floor(Math.random() * HAGARI_QUOTES.length)];
+    const randomQuote = BOOM_MESSAGES[Math.floor(Math.random() * BOOM_MESSAGES.length)];
     setQuote(randomQuote);
     setIsActive(true);
     setCooldown(true);
@@ -53,11 +53,11 @@ export default function HagariButton() {
           </motion.div>
         )}
 
-        <Shield size={20} className={isActive ? "text-score-calm" : ""} />
+        <Volume2 size={20} className={isActive ? "text-score-calm" : ""} />
         <span>
-          {isActive ? "הגרי מדבר..." : cooldown ? "מעכל את ההרגעה..." : "לחץ להרגעה מיידית"}
+          {isActive ? "מנתח פיצוץ..." : cooldown ? "נרגעים מהבום..." : "שמעתי בום"}
         </span>
-        <span className="text-xs opacity-60 font-normal">[כפתור הגרי]</span>
+        <span className="text-xs opacity-60 font-normal">[כפתור הרגעה]</span>
       </motion.button>
 
       {/* Quote overlay */}
@@ -74,9 +74,9 @@ export default function HagariButton() {
               {/* Blinking dot */}
               <span className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-score-calm animate-blink" />
               <div>
-                <p className="text-xs text-score-calm/70 font-mono-tech mb-1">// דובר צהל - הודעה רשמית</p>
-                <p className="text-sm text-foreground leading-relaxed">"{quote}"</p>
-                <p className="text-xs text-muted-foreground mt-2 font-mono-tech">— דניאל הגרי, דובר צה״ל</p>
+                <p className="text-xs text-score-calm/70 font-mono-tech mb-1">// ניתוח אקוסטי - דו״ח מצב</p>
+                <p className="text-sm text-foreground leading-relaxed">{quote}</p>
+                <p className="text-xs text-muted-foreground mt-2 font-mono-tech">— מערכת זיהוי בומים לאומית</p>
               </div>
             </div>
           </motion.div>

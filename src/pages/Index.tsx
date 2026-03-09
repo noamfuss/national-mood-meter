@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Bomb, Coffee, Ghost, RefreshCw, Activity, Newspaper } from "lucide-react";
 import MoodGauge from "@/components/MoodGauge";
 import HeadlinesFeed from "@/components/HeadlinesFeed";
-import HagariButton from "@/components/HagariButton";
+import BoomButton from "@/components/BoomButton";
 import StatusBar from "@/components/StatusBar";
 import SimulateToggle from "@/components/SimulateToggle";
 import { SIMULATE_SCENARIOS, getScoreLabel, type MoodData } from "@/lib/moodData";
@@ -208,8 +208,8 @@ export default function Index() {
               onScenarioChange={setScenario}
             />
 
-            {/* Hagari Button */}
-            <HagariButton />
+            {/* Boom Button */}
+            <BoomButton />
 
             {/* Stats mini grid */}
             <div className="grid grid-cols-2 gap-3">
@@ -269,7 +269,7 @@ export default function Index() {
               <p className="text-xs text-muted-foreground font-mono-tech text-center">
                 {isSimulate || isFallback
                   ? isFallback ? "// נתוני ברירת מחדל — אין חיבור לשרת" : "// נתוני סימולציה — לא נתוני חדשות אמיתיים"
-                  : `// מקורות: ynet, walla, mako, n12, haaretz`}
+                  : `מקורות: ynet, walla, mako, haaretz`}
               </p>
             </div>
           </motion.div>
