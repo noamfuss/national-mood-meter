@@ -11,10 +11,8 @@ Environment variables (.env):
     GEMINI_API_KEY=your_key_here
 """
 
-import re
 import os
 import json
-import time
 from datetime import datetime
 from pathlib import Path
 from fastapi import FastAPI
@@ -79,9 +77,7 @@ async def get_mood():
     log_request()
     cached = load_cache()
     if cached:
-        # Check if cache is reasonably fresh (e.g., within 15 mins) just as a safeguard
-        if "saved_at" in cached and (time.time() - cached["saved_at"]) < 900:
-            return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
+        return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
 
     # Emergency fallback or if cache is missing/stale
     return MoodResponse(
