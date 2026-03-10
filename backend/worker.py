@@ -202,6 +202,21 @@ def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
         return headlines
 
 
+def log_score(score: int, impactful_headline:dict) -> None:
+    """
+    Logs the current score and the most impactful headline for monitoring purposes
+    """
+    filename = f"daily_scores/{datetime.now().date().isoformat()}.jsonl"
+    log_entry = {
+        "timestamp": datetime.now().isoformat(),
+        "score": score,
+        "top_headline": impactful_headline.get("text", "") if impactful_headline else "N/A",
+        "impact": impactful_headline.get("impact", "N/A") if impactful_headline else "N/A"
+    }
+    with open(filename, "a", encoding="utf-8") as f:
+        f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+     
+
 async def update_mood_data():
     """
     Fetches headlines, scores them, and updates the cache with the latest mood data
@@ -241,6 +256,7 @@ async def update_mood_data():
         "top_headlines": headlines_out,
         "last_updated": datetime.now().isoformat(),
     }
+    log_score(total_score, scored_headlines[0] if scored_headlines else {})
     print(f"[{datetime.now().isoformat()}] Mood update completed: Score={total_score}, Headlines={len(headlines_out)}", flush=True)
     save_cache(result)
 

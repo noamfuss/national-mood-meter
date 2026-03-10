@@ -67,6 +67,12 @@ class MoodResponse(BaseModel):
     top_headlines: list[HeadlineItem]
     last_updated: str
 
+class DailyScoreItem(BaseModel):
+    timestamp: str
+    score: int
+    top_headline: str | None
+    impact: int | None
+
 
 # ─── Core Logic ──────────────────────────────────────────────────────────────
 # (Processing logic moved to worker.py)
@@ -86,6 +92,29 @@ async def get_mood():
         top_headlines=[],
         last_updated=datetime.now().isoformat(),
     )
+
+@app.get("/api/daily-scores", response_model=list[DailyScoreItem])
+async def get_daily_scores():
+
+    filename = f"daily_scores/{datetime.now().date().isoformat()}.jsonl"
+    if not Path(filename).exists():
+        return []
+
+    daily_scores = []
+    with open(filename, "r", encoding="utf-8") as f:
+        for line in f:
+            try:
+                data = json.loads(line)
+                daily_scores.append(DailyScoreItem(
+                    timestamp=data.get("timestamp", ""),
+                    score=data.get("score", 0),
+                    top_headline=data.get("top_headline", None),
+                    impact=data.get("impact", None)
+                ))
+            except json.JSONDecodeError:
+                continue
+
+    return daily_scores
 
 
 @app.get("/health")

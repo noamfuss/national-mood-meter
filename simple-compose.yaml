@@ -19,6 +19,9 @@ services:
             - ./backend/.env
         volumes:
             - type: bind
+              source: ./backend/daily_scores
+              target: /app/daily_scores
+            - type: bind
               source: ./backend/mood_cache.json
               target: /app/mood_cache.json
         restart: unless-stopped
