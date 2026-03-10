@@ -294,7 +294,7 @@ export default function Index() {
               <p className="text-xs text-muted-foreground font-mono-tech text-center">
                 {isSimulate || isFallback
                   ? isFallback ? "// נתוני ברירת מחדל — אין חיבור לשרת" : "// נתוני סימולציה — לא נתוני חדשות אמיתיים"
-                  : `מקורות: ynet, walla, mako, haaretz`}
+                  : `מקורות: Ynet, Walla, Mako, Maariv`}
               </p>
             </div>
           </motion.div>

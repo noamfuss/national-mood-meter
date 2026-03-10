@@ -7,6 +7,9 @@ services:
             - type: bind
               source: ./backend/mood_cache.json
               target: /app/mood_cache.json
+            - type: bind
+              source: ./backend/daily_scores
+              target: /app/daily_scores
         ports:
             - "8000:8000"
         restart: unless-stopped

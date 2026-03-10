@@ -3,7 +3,7 @@
 Because in Israel, "How are you?" is a geopolitical question.
 
 ## What is this?
-The **National Mood Meter** is a statistically questionable, emotionally volatile tool that reads real-time news headlines from major Israeli outlets (Ynet, Walla, Mako, Haaretz) and tells you exactly how stressed you should be on a scale of "Everything is fine" to "Get into the shelter"
+The **National Mood Meter** is a statistically questionable, emotionally volatile tool that reads real-time news headlines from major Israeli outlets (Ynet, Walla, Mako, Maariv) and tells you exactly how stressed you should be on a scale of "Everything is fine" to "Get into the shelter"
 
 By using AI-powered sentiment analysis via Google Gemini, we provide a definitive, scientific* metric for the collective Israeli psyche
 

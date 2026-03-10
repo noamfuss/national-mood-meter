@@ -146,7 +146,7 @@ export default function DailyChart({ borderClass, textClass }: { borderClass: st
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <span className="text-xs text-muted-foreground font-mono-tech tracking-widest">
-          // מגמת היום
+          // מגמה יומית
         </span>
         <span className={`text-xs font-mono-tech font-bold ${textClass}`}>
           DAILY TREND
