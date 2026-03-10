@@ -7,6 +7,7 @@ import HeadlinesFeed from "@/components/HeadlinesFeed";
 import BoomButton from "@/components/BoomButton";
 import StatusBar from "@/components/StatusBar";
 import SimulateToggle from "@/components/SimulateToggle";
+import DailyChart from "@/components/DailyChart";
 import { SIMULATE_SCENARIOS, getScoreLabel, type MoodData } from "@/lib/moodData";
 
 const API_URL = import.meta.env.DEV ? "http://localhost:8000/api/mood" : "/api/mood";
