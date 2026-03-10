@@ -5,7 +5,7 @@ import json
 import time
 import feedparser
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from google import genai
 from google.api_core import exceptions
@@ -20,6 +20,7 @@ client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 # ─── Cache ───────────────────────────────────────────────────────────────────
 CACHE_FILE = Path(__file__).parent / "mood_cache.json"
 UPDATE_INTERVAL = 5 * 60  # 5 minutes
+CUTOFF_DAYS = 2  # Only consider news from the last 2 days
 
 
 def load_cache() -> dict:
@@ -60,20 +61,42 @@ def get_status(score: int) -> str:
 
 
 def fetch_headlines() -> list[dict]:
+    """
+    Fetches headlines from RSS feeds. Only includes headlines from the last CUTOFF_DAYS days.
+    """
     results = []
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=CUTOFF_DAYS)
+    
     for i, (feed_source, feed_url) in enumerate(RSS_FEEDS.items()):
         try:
             feed = feedparser.parse(feed_url)
             for entry in feed.entries[:10]:
                 title = entry.get("title", "").strip()
+                published_parsed = entry.get("published_parsed")
+                
+                if published_parsed:
+                    # published_parsed is a time.struct_time, convert to datetime
+                    pub_date = datetime(*published_parsed[:6], tzinfo=timezone.utc)
+                    if pub_date < cutoff:
+                        continue
+
                 if title:
-                    results.append({"id": f"{i}-{len(results)}", "text": title, "source": feed_source, "datetime": entry.get("published", "")})
+                    results.append({
+                        "id": f"{i}-{len(results)}", 
+                        "text": title, 
+                        "source": feed_source, 
+                        "datetime": entry.get("published", "")
+                    })
         except Exception as e:
             print(f"[Feed error] {feed_url}: {e}")
     return results
 
 
 def llm_score_headlines(headlines: list[dict]) -> list[dict]:
+    """
+    Scores headlines using Gemini LLM. Returns list of headlines with 'impact' field added
+    """
     if not client:
         return []
 
@@ -142,6 +165,10 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
 
 
 def calculate_score(headlines: list[dict]) -> int:
+    """
+    Calculate overall mood score based on headline impacts
+    Normalizes to a 0-100 scale where 0 is very calm and 100 is full panic
+    """
     if not headlines:
         return 30
     total_impact = sum(h.get("impact", 0) for h in headlines)
@@ -150,6 +177,9 @@ def calculate_score(headlines: list[dict]) -> int:
 
 
 def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
+    """
+    Deduplicate headlines using LLM. Returns a list of unique headlines
+    """
     if not client or not headlines:
         return headlines
 
@@ -173,6 +203,9 @@ def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
 
 
 async def update_mood_data():
+    """
+    Fetches headlines, scores them, and updates the cache with the latest mood data
+    """
     print(f"[{datetime.now().isoformat()}] Starting mood update...", flush=True)
     raw_headlines = fetch_headlines()
     if not raw_headlines:
