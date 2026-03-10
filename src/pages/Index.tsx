@@ -248,6 +248,9 @@ export default function Index() {
                 </div>
               ))}
             </div>
+
+            {/* Daily trend chart */}
+            <DailyChart borderClass={borderClass} textClass={textClass} />
           </motion.div>
 
           {/* ── Right Panel: Headlines ── */}
