@@ -48,22 +48,6 @@ RSS_FEEDS = {
     "Mako": "https://storage.googleapis.com/mako-sitemaps/rssHomepage.xml",
 }
 
-# ─── Keyword Stress Weights ──────────────────────────────────────────────────
-STRESS_KEYWORDS: dict[str, int] = {
-    "פיגוע": 25, "פיצוץ": 22, "ירי": 20, "טיל": 20, "רקטה": 20,
-    "יירוטים": 20, "יירוט": 18, "אזעקה": 18, "סירנה": 18, "נפגע": 22,
-    "הרוג": 30, "פצוע": 20, "חדירה": 22, "מתקפה": 25, "פלישה": 22,
-    "חיזבאללה": 15, "חמאס": 12, "גיוס": 10, "כוננות": 15,
-    "חירום": 20, "פינוי": 18, "מקלט": 15, "ממ\"ד": 12,
-    "כטב\"מ": 15, "מל\"ט": 15, "נשק": 10, "לחימה": 20,
-    "מתיחות": 10, "עימות": 12, "תקרית": 8, "ניסיון": 8,
-    "ביטחוני": 8, "דיון חשאי": 8,
-    "חזרה לשגרה": -15, "שגרה": -10, "הסכם": -12, "שביתת נשק": -18,
-    "שחרור חטופים": -20, "חטופים חזרו": -25, "הסדר": -12,
-    "שלום": -10, "פתיחת בתי ספר": -10, "תיירות": -8,
-    "נחיתה": -5, "שגרירות": -5, "דיפלומטיה": -8,
-}
-
 
 def get_status(score: int) -> str:
     if score <= 10:  return "תישן טוב הלילה 😴"
@@ -87,15 +71,6 @@ def fetch_headlines() -> list[dict]:
         except Exception as e:
             print(f"[Feed error] {feed_url}: {e}")
     return results
-
-
-def keyword_score(text: str) -> int:
-    total = 0
-    text_lower = text.lower()
-    for kw, weight in STRESS_KEYWORDS.items():
-        if kw in text_lower or kw in text:
-            total += weight
-    return max(-30, min(30, total))
 
 
 def llm_score_headlines(headlines: list[dict]) -> list[dict]:
