@@ -14,6 +14,7 @@ import {
 import { Activity } from "lucide-react";
 
 const API_BASE = import.meta.env.DEV ? "http://localhost:8000" : "";
+const REFRESH_INTERVAL = 5 * 60_000; // 5 minutes
 
 interface DailyScoreItem {
   timestamp: string;
@@ -101,36 +102,39 @@ export default function DailyChart({ borderClass, textClass }: { borderClass: st
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const fetchChartData = async (isManual = false) => {
+    if (isManual) setLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/daily-scores`);
+      if (!r.ok) throw new Error();
+      const data = (await r.json()) as DailyScoreItem[];
+      setPoints(
+        data.map((d) => ({
+          time: new Date(d.timestamp).toLocaleTimeString("he-IL", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          score: d.score,
+          top_headline: d.top_headline ?? null,
+          impact: d.impact ?? null,
+        }))
+      );
+      setError(false);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    fetch(`${API_BASE}/api/daily-scores`)
-      .then((r) => {
-        if (!r.ok) throw new Error();
-        return r.json() as Promise<DailyScoreItem[]>;
-      })
-      .then((data) => {
-        if (cancelled) return;
-        setPoints(
-          data.map((d) => ({
-            time: new Date(d.timestamp).toLocaleTimeString("he-IL", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            score: d.score,
-            top_headline: d.top_headline ?? null,
-            impact: d.impact ?? null,
-          }))
-        );
-        setError(false);
-      })
-      .catch(() => {
-        if (!cancelled) setError(true);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
+    fetchChartData(true);
+
+    const interval = setInterval(() => {
+      fetchChartData(false);
+    }, REFRESH_INTERVAL);
+
+    return () => clearInterval(interval);
   }, []);
 
   const lastScore = points.at(-1)?.score ?? 50;
@@ -214,7 +218,7 @@ export default function DailyChart({ borderClass, textClass }: { borderClass: st
               dataKey="score"
               stroke={lineColor}
               strokeWidth={2}
-              dot={<ScoreDot />}
+              dot={false}
               activeDot={<ActiveDot />}
               isAnimationActive={true}
               animationDuration={800}

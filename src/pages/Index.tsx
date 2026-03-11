@@ -11,7 +11,7 @@ import DailyChart from "@/components/DailyChart";
 import { SIMULATE_SCENARIOS, getScoreLabel, type MoodData } from "@/lib/moodData";
 
 const API_URL = import.meta.env.DEV ? "http://localhost:8000/api/mood" : "/api/mood";
-const REFRESH_INTERVAL = 60_000; // 1 minute
+const REFRESH_INTERVAL = 5 * 60_000; // 5 minutes
 
 export default function Index() {
   const [isSimulate, setIsSimulate] = useState(false);
