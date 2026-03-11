@@ -202,6 +202,17 @@ def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
         return headlines
 
 
+def get_impactful_headline(headlines: list[dict], score: int) -> dict:
+    """Get the headline that contributed the most to the score"""
+    for h in headlines:
+        impact = h.get("impact", 0)
+        if score >= 50 and impact > 0:
+            return h
+        if score < 50 and impact < 0:
+            return h
+    return {}
+
+
 def log_score(score: int, impactful_headline:dict) -> None:
     """
     Logs the current score and the most impactful headline for monitoring purposes
@@ -256,7 +267,8 @@ async def update_mood_data():
         "top_headlines": headlines_out,
         "last_updated": datetime.now().isoformat(),
     }
-    log_score(total_score, scored_headlines[0] if scored_headlines else {})
+    impactful_headline = get_impactful_headline(scored_headlines, total_score)
+    log_score(total_score, impactful_headline if impactful_headline else {})
     print(f"[{datetime.now().isoformat()}] Mood update completed: Score={total_score}, Headlines={len(headlines_out)}", flush=True)
     save_cache(result)
 
