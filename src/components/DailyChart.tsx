@@ -211,7 +211,11 @@ export default function DailyChart({ borderClass, textClass }: { borderClass: st
               tickLine={false}
             />
 
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: lineColor, strokeOpacity: 0.3, strokeWidth: 1 }} />
+            <Tooltip 
+              content={<CustomTooltip />} 
+              cursor={{ stroke: lineColor, strokeOpacity: 0.3, strokeWidth: 1 }}
+              position={{ y: -60 }}
+            />
 
             <Line
               type="monotone"
