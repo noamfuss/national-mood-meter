@@ -80,6 +80,8 @@ def fetch_headlines() -> list[dict]:
                     pub_date = datetime(*published_parsed[:6], tzinfo=timezone.utc)
                     if pub_date < cutoff:
                         continue
+                    if feed_source == "Walla":
+                        pub_date = pub_date - timedelta(hours=1)  # Walla times are GMT
 
                 if title:
                     results.append({
