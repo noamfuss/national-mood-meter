@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
+from get_status import get_status
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -83,6 +84,12 @@ async def get_mood():
     log_request()
     cached = load_cache()
     if cached:
+        return MoodResponse(
+            score=cached.get("score", 0),
+            status=get_status(cached.get("score", 0)),
+            top_headlines=[HeadlineItem(**h) for h in cached.get("top_headlines", [])],
+            last_updated=cached.get("last_updated", datetime.now().isoformat())
+        )
         return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
 
     # Emergency fallback or if cache is missing/stale
