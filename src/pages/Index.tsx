@@ -8,6 +8,7 @@ import BoomButton from "@/components/BoomButton";
 import StatusBar from "@/components/StatusBar";
 import SimulateToggle from "@/components/SimulateToggle";
 import DailyChart from "@/components/DailyChart";
+import AlertsPanel from "@/components/AlertsPanel";
 import { SIMULATE_SCENARIOS, getScoreLabel, type MoodData } from "@/lib/moodData";
 
 const API_URL = import.meta.env.DEV ? "http://localhost:8000/api/mood" : "/api/mood";
@@ -221,14 +222,19 @@ export default function Index() {
               <MoodGauge score={currentScore} />
             </div>
 
-            {/* Connection Status Panel */}
-            <SimulateToggle
-              isSimulate={isSimulate}
-              isFallback={isFallback}
-              onToggle={(val) => { setIsSimulate(val); setIsFallback(false); setError(null); }}
-              scenario={scenario}
-              onScenarioChange={setScenario}
-            />
+            {/* Connection Status Panel — only in DEV or fallback */}
+            {(import.meta.env.DEV || isFallback) && (
+              <SimulateToggle
+                isSimulate={isSimulate}
+                isFallback={isFallback}
+                onToggle={(val) => { setIsSimulate(val); setIsFallback(false); setError(null); }}
+                scenario={scenario}
+                onScenarioChange={setScenario}
+              />
+            )}
+
+            {/* Live alerts panel — shown when backend reports active alerts */}
+            <AlertsPanel />
 
             {/* Boom Button */}
             <BoomButton onPress={handleBoomPress} />
