@@ -77,8 +77,13 @@ If you have Docker and Docker Compose installed:
 
 ## Tech Stack
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS, Framer Motion, shadcn/ui.
-- **Backend**: Python, FastAPI, Feedparser, Google Generative AI.
+- **Backend**: Python, FastAPI.
+- **Worker**: Python, Feedparser, Google Generative AI.
 - **Deployment**: Docker, Docker Compose, Nginx.
+
+## How it works
+Every 10 minutes, the worker scans rss feeds of multiple Israeli news websites, and use gemini to deduplicate and rate them, and finally save them to a file. Then the backend serves that file to the frontend, which displays that data.  
+This arcitecture ensures that this project won't consume too many tokens, so even a free api key can be used. 
 
 ## License
 MIT - Use it, fork it, just don't blame us for your rising blood pressure.
