@@ -222,14 +222,19 @@ export default function Index() {
               <MoodGauge score={currentScore} />
             </div>
 
-            {/* Connection Status Panel */}
-            <SimulateToggle
-              isSimulate={isSimulate}
-              isFallback={isFallback}
-              onToggle={(val) => { setIsSimulate(val); setIsFallback(false); setError(null); }}
-              scenario={scenario}
-              onScenarioChange={setScenario}
-            />
+            {/* Connection Status Panel — only in DEV or fallback */}
+            {(import.meta.env.DEV || isFallback) && (
+              <SimulateToggle
+                isSimulate={isSimulate}
+                isFallback={isFallback}
+                onToggle={(val) => { setIsSimulate(val); setIsFallback(false); setError(null); }}
+                scenario={scenario}
+                onScenarioChange={setScenario}
+              />
+            )}
+
+            {/* Live alerts panel — shown when backend reports active alerts */}
+            <AlertsPanel />
 
             {/* Boom Button */}
             <BoomButton onPress={handleBoomPress} />
