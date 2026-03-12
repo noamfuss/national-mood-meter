@@ -237,7 +237,7 @@ export default function Index() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: "כותרות מנוטרות", value: data.top_headlines.length, icon: <Newspaper size={14} /> },
-                { label: "עדכון אחרון", value: lastRefresh.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }), icon: <Activity size={14} /> },
+                { label: "סנכרון אחרון", value: lastRefresh.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }), icon: <Activity size={14} /> },
               ].map((stat) => (
                 <div key={stat.label} className="p-3 rounded-lg border border-war-border bg-war-card/40 text-center">
                   <div className="flex items-center justify-center gap-1.5 text-muted-foreground mb-1">

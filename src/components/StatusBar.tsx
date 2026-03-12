@@ -70,7 +70,7 @@ export default function StatusBar({ score, status, lastUpdated, isSimulate, isLo
         </div>
         <div className="flex items-center gap-1.5">
           <Clock size={12} className="opacity-60" />
-          <span>עדכון אחרון: {new Date(lastUpdated).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}</span>
+          <span>עדכניות נתונים: {new Date(lastUpdated).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}</span>
         </div>
       </div>
     </div>
