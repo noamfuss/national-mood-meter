@@ -1,8 +1,6 @@
 services:
     backend:
         build: ./backend
-        env_file:
-            - ./backend/.env
         volumes:
             - type: bind
               source: ./backend/mood_cache.json

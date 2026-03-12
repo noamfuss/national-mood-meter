@@ -6,23 +6,15 @@ Requirements:
 
 Run:
     uvicorn main:app --reload --port 8000
-
-Environment variables (.env):
-    GEMINI_API_KEY=your_key_here
 """
 
-import os
 import json
 from datetime import datetime
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from google import genai
 from get_status import get_status
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = FastAPI(title="National Pulse API")
 
@@ -34,10 +26,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
-
-# ─── Configure Gemini ────────────────────────────────────────────────────────
-GEMINI_KEY = os.getenv("GEMINI_API_KEY", "")
-client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 
 # ─── Cache ───────────────────────────────────────────────────────────────────
 CACHE_FILE = Path(__file__).parent / "mood_cache.json"
@@ -126,7 +114,7 @@ async def get_daily_scores():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "llm": "gemini" if client else "keywords-only"}
+    return {"status": "ok"}
 
 
 if __name__ == "__main__":

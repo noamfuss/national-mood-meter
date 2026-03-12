@@ -1,7 +1,5 @@
 # The National Pulse – Backend
 fastapi
 uvicorn[standard]
-feedparser
 requests
-google-genai
 python-dotenv
