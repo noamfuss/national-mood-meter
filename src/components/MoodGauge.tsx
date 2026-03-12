@@ -176,8 +176,8 @@ export default function MoodGauge({ score }: MoodGaugeProps) {
         </text>
 
         {/* Bottom labels */}
-        <text x={cx - r} y={cy + 20} textAnchor="middle" fontSize="8" fill="hsl(150, 80%, 40%)" fontFamily="Heebo, sans-serif">שלווה</text>
-        <text x={cx + r} y={cy + 20} textAnchor="middle" fontSize="8" fill="hsl(0, 80%, 50%)" fontFamily="Heebo, sans-serif">פאניקה</text>
+        <text x={cx - r} y={cy + 20} textAnchor="middle" fontSize="10" fill="hsl(150, 80%, 40%)" fontFamily="Heebo, sans-serif">שלווה</text>
+        <text x={cx + r} y={cy + 20} textAnchor="middle" fontSize="10" fill="hsl(0, 80%, 50%)" fontFamily="Heebo, sans-serif">פאניקה</text>
       </svg>
     </div>
   );

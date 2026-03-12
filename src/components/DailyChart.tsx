@@ -172,7 +172,7 @@ export default function DailyChart({ borderClass, textClass }: { borderClass: st
 
       {!loading && !error && points.length === 0 && (
         <div className="h-40 flex items-center justify-center text-muted-foreground text-xs font-mono-tech">
-          אין עדיין נקודות נתונים להיום
+          אין עדיין נתונים להיום
         </div>
       )}
 

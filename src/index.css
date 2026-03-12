@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Heebo:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Heebo:wght@300;400;500;700;900&family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -71,7 +71,7 @@
   }
 
   .font-mono-tech {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Cascadia Code', 'Share Tech Mono', monospace;
   }
 }
 
