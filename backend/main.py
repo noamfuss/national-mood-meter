@@ -121,7 +121,7 @@ def calculate_panic_boost(alerts: list[dict]) -> int:
         total_alert_impact += (weight * decay)
 
     # log(1 + x) * factor gives a nice increasing boost that tapers off as more alerts come in
-    boost = math.log1p(total_alert_impact) * 15 
+    boost = math.log1p(total_alert_impact) * 5  # factor can be tuned based on desired sensitivity 
     return int(boost)
 
 
