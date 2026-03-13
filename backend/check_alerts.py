@@ -71,7 +71,7 @@ def get_recent_alerts(minutes=10):
             for item in data:
                 try:
                     alert_time = datetime.strptime(item.get("alertDate", ""), "%Y-%m-%d %H:%M:%S")
-                    if alert_time > ten_minutes_ago:  #  and item.get("title") in ["חדירת כלי טיס עוין", "ירי רקטות וטילים"]
+                    if alert_time > ten_minutes_ago and item.get("title") in ["חדירת כלי טיס עוין", "ירי רקטות וטילים", "בדקות הקרובות צפויות להתקבל התרעות באזורך"]:
                         alerts_found.append({
                             "source": "oref",
                             "time": alert_time.isoformat(),

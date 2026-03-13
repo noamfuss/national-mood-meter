@@ -12,7 +12,7 @@ import AlertsPanel from "@/components/AlertsPanel";
 import { SIMULATE_SCENARIOS, getScoreLabel, type MoodData } from "@/lib/moodData";
 
 const API_URL = import.meta.env.DEV ? "http://localhost:8000/api/mood" : "/api/mood";
-const REFRESH_INTERVAL = 5 * 60_000; // 5 minutes
+const REFRESH_INTERVAL = 1 * 60_000; // 1 minute
 
 export default function Index() {
   const [isSimulate, setIsSimulate] = useState(false);
