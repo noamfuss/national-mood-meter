@@ -86,6 +86,24 @@ class BoomAnalysisResponse(BaseModel):
     is_interception: bool
     message: str
 
+class PanicByTimeItem(BaseModel):
+    hour: int
+    average_panic: float
+
+class StressfulSourceItem(BaseModel):
+    source: str
+    avg_impact: float
+    num_headlines: int
+
+class SentimentVariationItem(BaseModel):
+    sentiment_type: str
+    count: int
+    percentage: float
+class StatisticsResponse(BaseModel):
+    panic_by_time: list[PanicByTimeItem]
+    most_stressful_source: StressfulSourceItem | None
+    sentiment_variation: list[SentimentVariationItem]
+
 
 # ─── Core Logic ──────────────────────────────────────────────────────────────
 # (Processing logic moved to worker.py)
@@ -176,6 +194,18 @@ async def get_recent_alert_zones():
         zones=list(zones)
     )
 
+
+@app.get("/api/alerts")
+async def get_statistics():
+    panic_by_time = get_panic_by_time() or []
+    stressful_source = get_stressful_source()
+    variation = get_variation() or []
+    
+    return StatisticsResponse(
+        panic_by_time=[PanicByTimeItem(hour=int(row["hour_of_day"]), average_panic=row["avg_panic_score"]) for row in panic_by_time],
+        most_stressful_source=StressfulSourceItem(**stressful_source) if stressful_source else None,
+        sentiment_variation=[SentimentVariationItem(**item) for item in variation]
+    )
 
 @app.get("/health")
 async def health():
