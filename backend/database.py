@@ -33,8 +33,11 @@ def init_db():
     ''')
 
     cursor.execute('''
-        CREATE INDEX IF NOT EXISTS idx_headlines_timestamp ON headlines(timestamp);
-        CREATE INDEX IF NOT EXISTS idx_scores_timestamp ON daily_scores(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_headlines_timestamp ON headlines(timestamp)
+    ''')
+
+    cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_scores_timestamp ON daily_scores(timestamp)
     ''')
     
     conn.commit()
