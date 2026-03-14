@@ -19,7 +19,7 @@ def init_db():
         )
     ''')
     
-    # Optional: Create headlines table if we want to store all scored headlines historically
+    # Create headlines table with UNIQUE constraint
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS headlines (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,8 +27,14 @@ def init_db():
             source TEXT,
             impact INTEGER,
             timestamp TEXT,
-            is_llm BOOLEAN
+            is_llm BOOLEAN,
+            UNIQUE(text, timestamp)
         )
+    ''')
+
+    cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_headlines_timestamp ON headlines(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_scores_timestamp ON daily_scores(timestamp);
     ''')
     
     conn.commit()
@@ -50,20 +56,20 @@ def insert_daily_score(score: int, top_headline: str, impact: int):
         print(f"[DB Error] insert_daily_score: {e}")
 
 def insert_headlines(headlines: list[dict]):
-    """Inserts a list of headlines into the headlines table."""
+    """Inserts a list of headlines into the headlines table, ignoring duplicates."""
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         for h in headlines:
             cursor.execute('''
-                INSERT INTO headlines (text, source, impact, timestamp, is_llm)
+                INSERT OR IGNORE INTO headlines (text, source, impact, timestamp, is_llm)
                 VALUES (?, ?, ?, ?, ?)
             ''', (
                 h.get("text", "N/A"),
                 h.get("source", "N/A"),
                 h.get("impact", 0),
                 h.get("datetime", h.get("timestamp", "")),
-                h.get("is_llm", False)
+                int(bool(h.get("is_llm", False)))
             ))
         conn.commit()
         conn.close()

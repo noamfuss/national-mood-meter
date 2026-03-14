@@ -227,6 +227,14 @@ def log_score(score: int, impactful_headline:dict) -> None:
     )
 
 
+def log_headlines(headlines: list[dict]) -> None:
+    """
+    Logs the headlines to the database for monitoring and debugging purposes
+    """
+    # Insert only headlines that are unique for the same date
+    insert_headlines(headlines)
+
+
 async def update_mood_data():
     """
     Fetches headlines, scores them, and updates the cache with the latest mood data
@@ -237,8 +245,9 @@ async def update_mood_data():
         print("No headlines fetched.")
         return
 
-    unique_headlines = deduplicate_headlines(raw_headlines)
-    scored_headlines = llm_score_headlines(unique_headlines)
+    scored_headlines = llm_score_headlines(raw_headlines)
+    unique_headlines = deduplicate_headlines(scored_headlines)
+    log_headlines(unique_headlines)
     
     if not scored_headlines:
         print("Scoring failed. Cache not updated.")
