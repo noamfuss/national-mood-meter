@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from get_status import get_status
 from check_alerts import get_recent_alerts, ZONE_WEIGHTS
+from database import get_recent_scores
 
 app = FastAPI(title="National Pulse API")
 
@@ -150,26 +151,13 @@ async def get_mood():
 
 @app.get("/api/daily-scores", response_model=list[DailyScoreItem])
 async def get_daily_scores():
-
-    filename = f"daily_scores/{datetime.now().date().isoformat()}.jsonl"
-    if not Path(filename).exists():
-        return []
-
-    daily_scores = []
-    with open(filename, "r", encoding="utf-8") as f:
-        for line in f:
-            try:
-                data = json.loads(line)
-                daily_scores.append(DailyScoreItem(
-                    timestamp=data.get("timestamp", ""),
-                    score=data.get("score", 0),
-                    top_headline=data.get("top_headline", None),
-                    impact=data.get("impact", None)
-                ))
-            except json.JSONDecodeError:
-                continue
-
-    return daily_scores
+    rows = get_recent_scores(hours=24)
+    return [DailyScoreItem(
+        timestamp=row[0],
+        score=row[1],
+        top_headline=row[2],
+        impact=row[3]
+    ) for row in rows]
 
 
 @app.get("/api/alerts")

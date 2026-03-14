@@ -6,8 +6,8 @@ services:
               source: ./backend/mood_cache.json
               target: /app/mood_cache.json
             - type: bind
-              source: ./backend/daily_scores
-              target: /app/daily_scores
+              source: ./backend/mood_meter.db
+              target: /app/mood_meter.db
         ports:
             - "8000:8000"
         restart: unless-stopped
@@ -20,8 +20,8 @@ services:
             - ./backend/.env
         volumes:
             - type: bind
-              source: ./backend/daily_scores
-              target: /app/daily_scores
+              source: ./backend/mood_meter.db
+              target: /app/mood_meter.db
             - type: bind
               source: ./backend/mood_cache.json
               target: /app/mood_cache.json
