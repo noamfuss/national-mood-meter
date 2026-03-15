@@ -246,8 +246,8 @@ async def update_mood_data():
         return
 
     scored_headlines = llm_score_headlines(raw_headlines)
-    unique_headlines = deduplicate_headlines(scored_headlines)
-    log_headlines(unique_headlines)
+    scored_headlines = deduplicate_headlines(scored_headlines)
+    log_headlines(scored_headlines)
     
     if not scored_headlines:
         print("Scoring failed. Cache not updated.")
