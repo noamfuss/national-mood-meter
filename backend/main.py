@@ -151,13 +151,13 @@ async def get_mood():
     cached = load_cache()
     if cached:
         alerts = get_recent_alerts(ALERT_MINUTES)
+        score = cached.get("score", 0) + calculate_panic_boost(alerts)
         return MoodResponse(
-            score=cached.get("score", 0) + calculate_panic_boost(alerts),
-            status=get_status(cached.get("score", 0)),
+            score=min(score, 100),  # cap at 100
+            status=get_status(min(score, 100)),
             top_headlines=[HeadlineItem(**h) for h in cached.get("top_headlines", [])],
             last_updated=cached.get("last_updated", datetime.now().isoformat())
         )
-        return MoodResponse(**{k: v for k, v in cached.items() if k != "saved_at"})
 
     # Emergency fallback or if cache is missing/stale
     return MoodResponse(
