@@ -178,7 +178,7 @@ async def get_daily_scores():
     ) for row in rows]
 
 
-@app.get("/api/alerts")
+@app.get("/api/alerts", response_model=AlertItem)
 async def get_recent_alert_zones():
     recent_alerts = get_recent_alerts(ALERT_MINUTES)
     # Get all unique zones from recent alerts
@@ -195,7 +195,7 @@ async def get_recent_alert_zones():
     )
 
 
-@app.get("/api/alerts")
+@app.get("/api/statistics", response_model=StatisticsResponse)
 async def get_statistics():
     panic_by_time = get_panic_by_time() or []
     stressful_source = get_stressful_source()
