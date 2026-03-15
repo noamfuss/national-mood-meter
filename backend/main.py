@@ -133,7 +133,11 @@ def calculate_panic_boost(alerts: list[dict]) -> int:
         minutes_ago = (now - alert_time).total_seconds() / 60
         if minutes_ago > ALERT_MINUTES: continue
         
-        zone = CITIES.get(alert['city'][0], [""])[0]  # get the first zone for the first city
+        city = alert.get("cities", [alert.get("city")])  # get the first city
+        if not city:
+            continue
+        city = city[0]
+        zone = CITIES.get(city, "")  # get the first zone for the first city
         weight = ZONE_WEIGHTS.get(zone, 1)  # default weight of 1 for unknown areas
         
         # Calculate decay based on how recent the alert is (more recent = higher impact)
