@@ -142,7 +142,7 @@ export default function Index() {
               </span>
             </div>
 
-            {/* Refresh button */}
+            {/* Header buttons */}
             <div className="flex items-center gap-2">
               <Link
                 to="/about"
@@ -155,6 +155,7 @@ export default function Index() {
               >
                 <Info size={15} />
               </Link>
+              <AlertsStatsDialog />
               <button
                 onClick={fetchData}
                 disabled={isLoading}
