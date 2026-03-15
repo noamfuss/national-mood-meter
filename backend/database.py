@@ -80,6 +80,20 @@ def insert_headlines(headlines: list[dict]):
     except Exception as e:
         print(f"[DB Error] insert_headlines: {e}")
 
+@cache(ttl=timedelta(minutes=10))
+def get_headline_count() -> int:
+    """Returns the total number of headlines in the database."""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) FROM headlines')
+        count = cursor.fetchone()[0]
+        conn.close()
+        return count
+    except Exception as e:
+        print(f"[DB Error] get_headline_count: {e}")
+        return 0
+
 @cache(ttl=timedelta(minutes=1))
 def get_recent_scores(hours: int = 24):
     """Retrieves scores from the last X hours."""

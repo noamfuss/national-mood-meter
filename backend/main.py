@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from get_status import get_status
 from check_alerts import get_recent_alerts, ZONE_WEIGHTS
-from database import get_recent_scores
+from database import get_recent_scores, get_panic_by_time, get_stressful_source, get_variation, get_headline_count
 
 app = FastAPI(title="National Pulse API")
 
@@ -103,6 +103,7 @@ class StatisticsResponse(BaseModel):
     panic_by_time: list[PanicByTimeItem]
     most_stressful_source: StressfulSourceItem | None
     sentiment_variation: list[SentimentVariationItem]
+    headline_count: int | None
 
 
 # ─── Core Logic ──────────────────────────────────────────────────────────────
@@ -204,7 +205,8 @@ async def get_statistics():
     return StatisticsResponse(
         panic_by_time=[PanicByTimeItem(hour=int(row["hour_of_day"]), average_panic=row["avg_panic_score"]) for row in panic_by_time],
         most_stressful_source=StressfulSourceItem(**stressful_source) if stressful_source else None,
-        sentiment_variation=[SentimentVariationItem(**item) for item in variation]
+        sentiment_variation=[SentimentVariationItem(**item) for item in variation],
+        headline_count=get_headline_count()
     )
 
 @app.get("/health")

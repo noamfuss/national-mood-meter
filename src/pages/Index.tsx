@@ -155,7 +155,7 @@ export default function Index() {
               >
                 <Info size={15} />
               </Link>
-              <AlertsStatsDialog />
+              <AlertsStatsDialog borderClass={borderClass} />
               <button
                 onClick={fetchData}
                 disabled={isLoading}

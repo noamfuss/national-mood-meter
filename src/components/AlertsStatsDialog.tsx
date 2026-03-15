@@ -28,6 +28,7 @@ interface StatisticsData {
   panic_by_time: PanicByTimeItem[];
   most_stressful_source: StressfulSourceItem | null;
   sentiment_variation: SentimentItem[];
+  headline_count: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -77,7 +78,7 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function AlertsStatsDialog() {
+export default function AlertsStatsDialog({ borderClass }: { borderClass: string }) {
   const [open, setOpen] = useState(false);
   const [stats, setStats] = useState<StatisticsData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -124,7 +125,7 @@ export default function AlertsStatsDialog() {
       {/* Trigger */}
       <button
         onClick={() => setOpen(true)}
-        className="w-9 h-9 rounded-lg border border-war-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-200 hover:border-current"
+        className={`w-9 h-9 rounded-lg border ${borderClass} flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-200 hover:border-current`}
         title="סטטיסטיקות"
       >
         <BarChart2 size={15} />
@@ -145,18 +146,18 @@ export default function AlertsStatsDialog() {
             {/* Panel */}
             <motion.div
               key="panel"
-              initial={{ opacity: 0, scale: 0.95, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 24 }}
+              initial={{ opacity: 0, scale: 0.95, x: "-50%", y: "-48%" }}
+              animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
+              exit={{ opacity: 0, scale: 0.95, x: "-50%", y: "-48%" }}
               transition={{ duration: 0.28, type: "spring", stiffness: 300, damping: 26 }}
               dir="rtl"
-              className="fixed left-1/2 top-1/2 z-50 w-[95vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-xl border-2 border-war-border bg-background shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="fixed left-1/2 top-1/2 z-50 w-[95vw] max-w-3xl rounded-xl border-2 border-war-border bg-background shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               {/* Header */}
               <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-war-border/50 bg-background/95 backdrop-blur-sm">
                 <div className="flex items-center gap-2">
                   <TrendingUp size={16} className="text-score-neutral" />
-                  <span className="font-black text-base tracking-tight">סטטיסטיקות מצב הרוח</span>
+                  <span className="font-black text-base tracking-tight">סטטיסטיקות</span>
                   <span className="text-[10px] font-mono-tech text-muted-foreground">// STATISTICS</span>
                 </div>
                 <button
@@ -188,6 +189,27 @@ export default function AlertsStatsDialog() {
                 {/* Content */}
                 {!loading && !error && stats && (
                   <div className="flex flex-col gap-8">
+
+                    {/* ── Headline Count Card ── */}
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="flex items-center justify-between p-4 rounded-xl border border-war-border bg-war-card/40">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                            <Newspaper size={20} />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-mono-tech text-muted-foreground tracking-widest uppercase">// Total Headlines Processed</p>
+                            <h3 className="text-lg font-black leading-none">סה"כ כותרות שנותחו</h3>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-3xl font-mono font-black text-foreground">
+                            {stats.headline_count.toLocaleString()}
+                          </p>
+                          <p className="text-[10px] font-mono-tech text-muted-foreground tracking-tighter mt-1">LAST 24 HOURS</p>
+                        </div>
+                      </div>
+                    </div>
 
                     {/* ── Chart 1: Hourly Panic Bar Chart ── */}
                     <div>
@@ -278,7 +300,7 @@ export default function AlertsStatsDialog() {
 
                       {/* Most Stressful Source Card */}
                       <div>
-                        <SectionLabel>מקור הלחץ הגבוה ביותר — 24 שעות</SectionLabel>
+                        <SectionLabel>המקור המלחיץ ביותר — 24 שעות</SectionLabel>
                         {stats.most_stressful_source ? (
                           <div className="flex flex-col gap-4 p-4 rounded-xl border border-score-panic/30 bg-score-panic/5 h-[calc(100%-1.75rem)]">
                             {/* Source name */}
@@ -313,7 +335,7 @@ export default function AlertsStatsDialog() {
                             {/* Impact bar */}
                             <div className="flex flex-col gap-1">
                               <div className="flex justify-between text-[10px] font-mono-tech text-muted-foreground">
-                                <span>עוצמת לחץ</span>
+                                <span>לחץ ממוצע</span>
                                 <span>{Math.round((stats.most_stressful_source.avg_impact / 10) * 100)}%</span>
                               </div>
                               <div className="h-1.5 rounded-full bg-war-border overflow-hidden">
