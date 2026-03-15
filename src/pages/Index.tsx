@@ -9,6 +9,7 @@ import StatusBar from "@/components/StatusBar";
 import SimulateToggle from "@/components/SimulateToggle";
 import DailyChart from "@/components/DailyChart";
 import AlertsPanel from "@/components/AlertsPanel";
+import AlertsStatsDialog from "@/components/AlertsStatsDialog";
 import { SIMULATE_SCENARIOS, getScoreLabel, type MoodData } from "@/lib/moodData";
 
 const API_URL = import.meta.env.DEV ? "http://localhost:8000/api/mood" : "/api/mood";
@@ -141,7 +142,7 @@ export default function Index() {
               </span>
             </div>
 
-            {/* Refresh button */}
+            {/* Header buttons */}
             <div className="flex items-center gap-2">
               <Link
                 to="/about"
@@ -154,6 +155,7 @@ export default function Index() {
               >
                 <Info size={15} />
               </Link>
+              <AlertsStatsDialog />
               <button
                 onClick={fetchData}
                 disabled={isLoading}
