@@ -197,16 +197,12 @@ export default function AlertsStatsDialog({ borderClass }: { borderClass: string
                           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                             <Newspaper size={20} />
                           </div>
-                          <div>
-                            <p className="text-[10px] font-mono-tech text-muted-foreground tracking-widest uppercase">// Total Headlines Processed</p>
                             <h3 className="text-lg font-black leading-none">סה"כ כותרות שנותחו</h3>
-                          </div>
                         </div>
                         <div className="text-right">
                           <p className="text-3xl font-mono font-black text-foreground">
                             {stats.headline_count.toLocaleString()}
                           </p>
-                          <p className="text-[10px] font-mono-tech text-muted-foreground tracking-tighter mt-1">LAST 24 HOURS</p>
                         </div>
                       </div>
                     </div>
