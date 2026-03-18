@@ -1,5 +1,7 @@
 services:
     backend:
+        depends_on:
+            - worker
         build: ./backend
         volumes:
             - type: bind

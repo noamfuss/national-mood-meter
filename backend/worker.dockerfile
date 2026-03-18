@@ -16,4 +16,4 @@ RUN uv pip install --system --upgrade pip && \
 
 COPY . /app
 
-CMD [ "python3", "worker.py"]
+CMD [ "sh", "-c", "python3 database.py & python3 worker.py"]
