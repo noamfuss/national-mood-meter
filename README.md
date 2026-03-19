@@ -14,6 +14,7 @@ By using AI-powered sentiment analysis via Google Gemini, we provide a definitiv
 - **Headline Impact Feed**: See which specific news items are single-handedly ruining your day.
 - **The Boom Button**: For those moments when you just need to feel something.
 - **AI Sentiment Analysis**: Integration with Google Gemini to understand the nuance between "slightly concerning" and "catastrophic."
+- **Home front Command Alerts**: Real-time updates on which zones are currently under threat, so you can panic accordingly.
 
 ---
 
@@ -77,13 +78,13 @@ If you have Docker and Docker Compose installed:
 
 ## Tech Stack
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS, Framer Motion, shadcn/ui.
-- **Backend**: Python, FastAPI.
+- **Backend**: Python, FastAPI, sqlite.
 - **Worker**: Python, Feedparser, Google Generative AI.
 - **Deployment**: Docker, Docker Compose, Nginx.
 
 ## How it works
-Every 10 minutes, the worker scans rss feeds of multiple Israeli news websites, and use gemini to deduplicate and rate them, and finally save them to a file. Then the backend serves that file to the frontend, which displays that data.  
-This arcitecture ensures that this project won't consume too many tokens, so even a free api key can be used. 
+Every 10 minutes, the worker scans rss feeds of multiple Israeli news websites, and use gemini to deduplicate and rate them, and finally save them to a file (and logs each headline to a sqlite db). Then the backend serves that data to the frontend, in addition to home front command's (פיקוד העורף) alerts zones.  
+This arcitecture ensures that this project won't consume too many tokens, so even a free api key can be used. Additionally, every data read from the db is cached in memory for 10 minutes, to allow for even more scalability.
 
 ## License
 MIT - Use it, fork it, just don't blame us for your rising blood pressure.
