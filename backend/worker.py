@@ -20,8 +20,9 @@ client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 
 # ─── Cache ───────────────────────────────────────────────────────────────────
 CACHE_FILE = Path(__file__).parent / "mood_cache.json"
-UPDATE_INTERVAL = 5 * 60  # 5 minutes
+UPDATE_INTERVAL = 10 * 60  # 10 minutes
 CUTOFF_DAYS = 2  # Only consider news from the last 2 days
+LLM = "gemini-3.1-flash-lite-preview"  # Use a lighter model for faster responses and less rate limiting
 
 
 def load_cache() -> dict:
@@ -138,7 +139,7 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
 **סולם הדירוג (-10 עד +10):**
 - **חיובי (מינוס 1 עד מינוס 10):** הצלחות מבצעיות משמעותיות, חיסול בכירים, הצהרות הרגעה רשמיות של דו"צ, חזרה לשגרה מלאה, יירוטים מוצלחים של אירוע חריג. (זכור: במלחמה הנוכחית, תקיפה בטהרן נחשבת מרגיעה מאוד).
 - **ניטרלי (0):** חדשות תרבות, ספורט, מזג אוויר, פטירות של אישים שאינן קשורות למלחמה (למשל: דמויות עבר, אמנים), ונושאים כלכליים שוטפים. **כל מה שלא משנה את רמת האיום הבטחוני הוא 0.**
-- **שלילי (פלוס 1 עד פלוס 5):** שיבושי GPS, שמועות בטלגרם, דריכות גבוהה, שינויים קלים בהנחיות.
+- **שלילי (פלוס 1 עד פלוס 5):** שיבושי GPS, שיגורים לעבר ישראל, אזעקות.
 - **פאניקה (פלוס 6 עד פלוס 10):** מתקפה משולבת, ירי ללא הפסקה, אירוע רב נפגעים, נאומים של מנהיגי אויב עם איום מפורש, הרוגים מהצד הישראלי, תקיפת תשתיות קריטיות (חשמל/מים).
 
 **דירוגים קודמים:**
@@ -156,7 +157,7 @@ def llm_score_headlines(headlines: list[dict]) -> list[dict]:
 ענה בפורמט של רשימת מספרים מופרדים בפסיקים בלבד: 10,0,-5,7
 """
     try:
-        response = client.models.generate_content(model="gemini-3-flash-preview", contents=prompt)
+        response = client.models.generate_content(model=LLM, contents=prompt)
         raw = response.text.strip()
         scores = [int(x.strip()) for x in re.findall(r"-?\d+", raw)]
         for i, h in enumerate(headlines):
@@ -215,7 +216,7 @@ def deduplicate_headlines(headlines: list[dict]) -> list[dict]:
     prompt += "\nהחזר את מספרי הכותרות הייחודיות בלבד (למשל: 0, 2, 5), מופרדים על ידי פסיקים."
     
     try:
-        response = client.models.generate_content(model="gemini-3.1-flash-lite-preview", contents=prompt)
+        response = client.models.generate_content(model=LLM, contents=prompt)
         raw = response.text.strip()
         unique_indices = set(int(x.strip()) for x in re.findall(r"\d+", raw))
         return [h for i, h in enumerate(headlines) if i in unique_indices]
