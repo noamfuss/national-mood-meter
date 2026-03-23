@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Bomb, Coffee, Ghost, RefreshCw, Activity, Newspaper, Info } from "lucide-react";
+import { RefreshCw, Activity, Newspaper, Info, Github } from "lucide-react";
 import { Link } from "react-router-dom";
 import MoodGauge from "@/components/MoodGauge";
 import HeadlinesFeed from "@/components/HeadlinesFeed";
@@ -124,26 +124,24 @@ export default function Index() {
               </p>
             </div>
           </div>
-
-          {/* Right header icons */}
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-3 text-muted-foreground text-xs font-mono-tech">
-              <span className="flex items-center gap-1">
-                <Shield size={13} className="text-score-calm" /> הגנה
-              </span>
-              <span className="flex items-center gap-1">
-                <Bomb size={13} className="text-score-panic" /> איום
-              </span>
-              <span className="flex items-center gap-1">
-                <Coffee size={13} className="text-score-neutral" /> שקט
-              </span>
-              <span className="flex items-center gap-1">
-                <Ghost size={13} className="text-muted-foreground" /> כלום
-              </span>
-            </div>
-
+          <div>
             {/* Header buttons */}
             <div className="flex items-center gap-2">
+              <a
+                href="https://github.com/noamfuss/national-mood-meter"
+                target="_blank"
+                rel="noreferrer"
+                className={`
+                  h-9 px-3 rounded-lg flex items-center gap-2
+                  text-muted-foreground hover:text-foreground
+                  transition-all duration-200 hover:border-current
+                  text-xs font-mono-tech
+                `}
+                title="GitHub"
+              >
+                <span className="hidden sm:inline">github</span>
+                <Github size={14} />
+              </a>
               <Link
                 to="/about"
                 className={`
@@ -165,6 +163,7 @@ export default function Index() {
                   transition-all duration-200 hover:border-current
                   disabled:opacity-40
                 `}
+                title="סנכרון"
               >
                 <RefreshCw size={15} className={isLoading ? "animate-spin" : ""} />
               </button>
@@ -315,7 +314,7 @@ export default function Index() {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="text-center text-xs text-muted-foreground font-mono-tech py-4 border-t border-war-border/30"
         >
-          NATIONAL PULSE // מצב הרוח הלאומי // {new Date().getFullYear()} // NOT OFFICIAL NEWS // <a href="https://github.com/noamfuss/national-mood-meter" className="underline hover:text-foreground transition-colors">github</a>
+          NATIONAL PULSE // מצב הרוח הלאומי // {new Date().getFullYear()} // NOT OFFICIAL NEWS
         </motion.footer>
       </div>
     </div>
