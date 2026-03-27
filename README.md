@@ -18,6 +18,12 @@ By using AI-powered sentiment analysis via Google Gemini, we provide a definitiv
 
 ---
 
+## Screenshots
+![Home](screenshots/main.png)
+![Dashboard](screenshots/metrics.png)
+
+---
+
 ## Getting Started
 
 ### Method 1: Docker Compose (The Easy Way)
@@ -29,8 +35,8 @@ If you have Docker and Docker Compose installed:
    cd national-mood-meter
    ```
 
-2. **Configure (Optional)**:
-   Add your API key to `backend/.env` if you want AI-powered stress:
+2. **Configure Gemini**:
+   Add your API key to `backend/.env` for AI-powered stress:
    ```env
    GEMINI_API_KEY=your_key_here
    ```
