@@ -16,4 +16,7 @@ RUN uv pip install --system --upgrade pip && \
 
 COPY . /app
 EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD [ "python3", "healthcheck.py" ]
+
 CMD ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
